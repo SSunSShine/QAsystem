@@ -1,0 +1,16 @@
+# 数据库
+db:
+  driver: mysql
+  addr: root:123456@/qasystem?charset=utf8&parseTime=True&loc=Local
+
+# Redis
+redis:
+  addr: 127.0.0.1:6379
+  password:
+  db: 0
+
+# jwt认证密钥
+jwtKey: jwt123456
+
+# 端口
+address: :9090
