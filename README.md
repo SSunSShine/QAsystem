@@ -15,7 +15,7 @@ $ cd QAsystem
 ### 2.下载依赖
 
 ```shell
-$ go mod download
+$ go mod tidy
 ```
 
 ### 3.修改配置信息

@@ -1,7 +1,7 @@
 # 数据库
 db:
   driver: mysql
-  addr: root:123456@/qasystem?charset=utf8&parseTime=True&loc=Local
+  addr: root:123456@tcp(127.0.0.1:3306)/qasystem?charset=utf8&parseTime=True&loc=Local
 
 # Redis
 redis:
@@ -13,4 +13,4 @@ redis:
 jwtKey: jwt123456
 
 # 端口
-address: :9090
+address: :8080
