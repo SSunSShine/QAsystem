@@ -34,13 +34,14 @@ func initAll(conf *conf.Configuration)  {
 	database.DB.AutoMigrate(&model.Profile{})
 	database.DB.AutoMigrate(&model.Question{})
 
-	p0 := model.Profile{Name: "admin",Gender: 1, Desc: "This is the first account."}
-	p0.Create()
-
-	u0 := model.User{Mail: "123456@123.com", Password: "123456", ProfileID: p0.ID}
+	u0 := model.User{Mail: "123456@123.com", Password: "123456"}
 	u0.Create()
 
-	q1 := model.Question{Title: "First Question", Desc: "This is the first question !", QuestionProfile: p0}
+	p0 := model.Profile{Name: "admin",Gender: 1, Desc: "This is the first account.", UserID: u0.ID}
+	p0.Create()
+
+
+	q1 := model.Question{Title: "First Question", Desc: "This is the first question !", UserID: u0.ID}
 	q1.Create()
 
 

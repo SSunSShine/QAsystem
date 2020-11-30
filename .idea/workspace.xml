@@ -6,8 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="d69ebe4e-0727-4544-ab30-8f6b6a433a1c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/configuration.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/conf/configuration.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/api/profile.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/api/profile.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/api/question.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/api/question.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/api/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/init.go" beforeDir="false" afterPath="$PROJECT_DIR$/init.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/middleware/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/middleware/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/profile.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/profile.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/question.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/question.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/route/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/route/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/question.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/question.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/sign.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/sign.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,10 +89,10 @@
     </environment>
   </component>
   <component name="WindowStateProjectService">
-    <state x="958" y="153" key="FileChooserDialogImpl" timestamp="1606030669981">
+    <state x="958" y="153" key="FileChooserDialogImpl" timestamp="1606742765980">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="958" y="153" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1606030669981" />
+    <state x="958" y="153" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1606742765980" />
     <state x="746" y="334" key="Github.ShareDialog" timestamp="1605947634667">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -92,29 +101,29 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="640" y="141" key="Github.UntrackedFilesDialog/0.0.1536.824@0.0.1536.824" timestamp="1605947644296" />
-    <state width="1150" height="188" key="GridCell.Tab.0.bottom" timestamp="1605950296431">
+    <state width="1493" height="191" key="GridCell.Tab.0.bottom" timestamp="1606748239817">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1150" height="188" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1605950296431" />
-    <state width="1150" height="188" key="GridCell.Tab.0.center" timestamp="1605950296431">
+    <state width="1493" height="191" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1606748239817" />
+    <state width="1493" height="191" key="GridCell.Tab.0.center" timestamp="1606748239817">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1150" height="188" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1605950296431" />
-    <state width="1150" height="188" key="GridCell.Tab.0.left" timestamp="1605950296431">
+    <state width="1493" height="191" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1606748239817" />
+    <state width="1493" height="191" key="GridCell.Tab.0.left" timestamp="1606748239817">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1150" height="188" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1605950296431" />
-    <state width="1150" height="188" key="GridCell.Tab.0.right" timestamp="1605950296431">
+    <state width="1493" height="191" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1606748239817" />
+    <state width="1493" height="191" key="GridCell.Tab.0.right" timestamp="1606748239817">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1150" height="188" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1605950296431" />
+    <state width="1493" height="191" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1606748239817" />
     <state x="372" y="10" key="SettingsEditor" timestamp="1606030565068">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="372" y="10" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1606030565068" />
-    <state x="918" y="146" width="672" height="678" key="search.everywhere.popup" timestamp="1605944658153">
+    <state x="918" y="146" width="672" height="678" key="search.everywhere.popup" timestamp="1606742240878">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="918" y="146" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1605944658153" />
+    <state x="918" y="146" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1606742240878" />
   </component>
 </project>

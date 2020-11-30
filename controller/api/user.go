@@ -8,16 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 type UserVO struct {
 	ID        uint      `json:"id"`
 	Mail      string    `json:"mail"`
 	Password  string    `json:"password"`
-	Profile   ProfileVO `json:"profile"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 // GetUser 获取单个用户信息
@@ -39,11 +35,11 @@ func GetUser(c *gin.Context) {
 	}
 	var userVO UserVO
 	util.SimpleCopyProperties(&userVO, &user)
-	util.SimpleCopyProperties(&userVO.Profile, &user.Profile)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status": http.StatusOK,
-		"message": userVO,
+		"message": "ok",
+		"data": userVO,
 	})
 
 }
@@ -120,7 +116,8 @@ func GetUsersCount(c *gin.Context)  {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
-			"message": count,
+			"message": "ok",
+			"data": count,
 		})
 	}
 }

@@ -15,15 +15,15 @@ func (s *SignInterface) Sign() (code int, err error) {
 	var p model.Profile
 	var u model.User
 
+	u.Mail = s.Mail
+	u.Password = s.Password
+	code, err = u.Create()
+
 	p.Name = s.Name
 	p.Desc = "Hello ~ " + p.Name
 	p.Gender = s.Gender
-
-	u.Mail = s.Mail
-	u.Password = s.Password
-	u.Profile = p
-
-	code, err = u.Create()
+	p.UserID = u.ID
+	code, err = p.Create()
 
 	return
 }

@@ -6,18 +6,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type ProfileVO struct {
-	ID     uint   `json:"id"`
-	Name   string `json:"name"`
-	Gender int    `json:"gender"`
-	Desc   string `json:"desc"`
+	ID        uint      `json:"id"`
+	Name      string    `json:"name"`
+	Gender    int       `json:"gender"`
+	Desc      string    `json:"desc"`
+	User      UserVO    `json:"user"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-
 // GetProfile 获取单个用户简介
-func GetProfile(c *gin.Context)  {
+func GetProfile(c *gin.Context) {
 
 	var p model.Profile
 
@@ -34,14 +37,16 @@ func GetProfile(c *gin.Context)  {
 	}
 	var profileVO ProfileVO
 	util.SimpleCopyProperties(&profileVO, &profile)
+	util.SimpleCopyProperties(&profileVO.User, &profile.User)
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
-		"message": profileVO,
+		"status":  http.StatusOK,
+		"message": "ok",
+		"data": profileVO,
 	})
 }
 
-func UpdateProfile(c *gin.Context)  {
+func UpdateProfile(c *gin.Context) {
 
 	var p model.Profile
 
@@ -50,12 +55,60 @@ func UpdateProfile(c *gin.Context)  {
 
 	if err := c.ShouldBindJSON(&p); err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusInternalServerError,
+			"status":  http.StatusInternalServerError,
 			"message": err.Error(),
 		})
 		return
 	}
 	if code, err := p.Update(); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusOK,
+			"message": code,
+		})
+	}
+}
+
+func GetProfilesCount(c *gin.Context) {
+
+	var p model.Profile
+
+	if count, err := p.Count(); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusOK,
+			"message": "ok",
+			"data": count,
+		})
+	}
+}
+
+// DeleteProfile
+func DeleteProfile(c *gin.Context)  {
+
+	var p model.Profile
+
+	id, _ := strconv.Atoi(c.Param("id"))
+	p.ID = uint(id)
+
+	profile, err := p.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if code, err := profile.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusNotFound,
 			"message": err.Error(),
@@ -64,23 +117,6 @@ func UpdateProfile(c *gin.Context)  {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
 			"message": code,
-		})
-	}
-}
-
-func GetProfilesCount(c *gin.Context)  {
-
-	var p model.Profile
-
-	if count, err := p.Count(); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusNotFound,
-			"message": err.Error(),
-		})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusOK,
-			"message": count,
 		})
 	}
 }

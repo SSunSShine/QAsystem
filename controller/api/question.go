@@ -11,18 +11,25 @@ import (
 )
 
 type QuestionVO struct {
-	ID                uint      `json:"id"`
-	Title             string    `json:"title"`
-	Desc              string    `json:"desc"`
-	QuestionProfile   ProfileVO `json:"questionProfile"`
-	CreatedAt         time.Time `json:"createdAt"`
-	UpdatedAt         time.Time `json:"updatedAt"`
+	ID         uint       `json:"id"`
+	Title      string     `json:"title"`
+	Desc       string     `json:"desc"`
+	Questioner Questioner `json:"questioner"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  time.Time  `json:"updatedAt"`
+}
+
+type Questioner struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Desc string `json:"desc"`
 }
 
 // GetQuestion 获取单个问题信息
-func GetQuestion(c *gin.Context)  {
+func GetQuestion(c *gin.Context) {
 
 	var q model.Question
+	var p model.Profile
 
 	id, _ := strconv.Atoi(c.Param("id"))
 	q.ID = uint(id)
@@ -30,7 +37,17 @@ func GetQuestion(c *gin.Context)  {
 	question, err := q.Get()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusNotFound,
+			"status":  http.StatusNotFound,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	p.UserID = q.UserID
+	profile, err := p.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
 			"message": err.Error(),
 		})
 		return
@@ -38,15 +55,16 @@ func GetQuestion(c *gin.Context)  {
 
 	var questionVO QuestionVO
 	util.SimpleCopyProperties(&questionVO, &question)
-	util.SimpleCopyProperties(&questionVO.QuestionProfile, &question.QuestionProfile)
+	util.SimpleCopyProperties(&questionVO.Questioner, &profile)
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
-		"message": questionVO,
+		"status":  http.StatusOK,
+		"message": "ok",
+		"data":    questionVO,
 	})
 }
 
-func UpdateQuestion(c *gin.Context)  {
+func UpdateQuestion(c *gin.Context) {
 
 	var q model.Question
 
@@ -55,7 +73,7 @@ func UpdateQuestion(c *gin.Context)  {
 
 	if err := c.ShouldBindJSON(&q); err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusInternalServerError,
+			"status":  http.StatusInternalServerError,
 			"message": err.Error(),
 		})
 		return
@@ -63,19 +81,19 @@ func UpdateQuestion(c *gin.Context)  {
 
 	if code, err := q.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusNotFound,
+			"status":  http.StatusNotFound,
 			"message": err.Error(),
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusOK,
+			"status":  http.StatusOK,
 			"message": code,
 		})
 	}
 
 }
 
-func DeleteQuestion(c *gin.Context)  {
+func DeleteQuestion(c *gin.Context) {
 
 	var q model.Question
 
@@ -84,46 +102,48 @@ func DeleteQuestion(c *gin.Context)  {
 
 	if code, err := q.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusNotFound,
+			"status":  http.StatusNotFound,
 			"message": err.Error(),
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusOK,
+			"status":  http.StatusOK,
 			"message": code,
 		})
 	}
 }
 
-// GetQuestionsCount 按用户简介id统计问题数量
-func GetQuestionsCount(c *gin.Context)  {
+// GetQuestionsCount 按用户id统计问题数量
+func GetQuestionsCount(c *gin.Context) {
 
 	var q model.Question
 
-	questionProfileID, _ := strconv.Atoi(c.Query("questionProfileID"))
-	q.QuestionProfileID = uint(questionProfileID)
+	userID, _ := strconv.Atoi(c.Query("userID"))
+	q.UserID = uint(userID)
 
 	if count, err := q.Count(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusNotFound,
+			"status":  http.StatusNotFound,
 			"message": err.Error(),
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusOK,
-			"message": count,
+			"status":  http.StatusOK,
+			"message": "ok",
+			"data":    count,
 		})
 	}
 }
 
-func CreateQuestion(c *gin.Context)  {
+func CreateQuestion(c *gin.Context) {
 
 	var cq service.CreateQuestionInterface
+	var p model.Profile
 
 	ProfileID, exist := c.Get("pid")
 	if !exist {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusNotFound,
+			"status":  http.StatusNotFound,
 			"message": "Not exist",
 		})
 		c.Abort()
@@ -132,7 +152,7 @@ func CreateQuestion(c *gin.Context)  {
 	value, ok := ProfileID.(uint)
 	if !ok {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusNotFound,
+			"status":  http.StatusNotFound,
 			"message": "Not uint",
 		})
 		c.Abort()
@@ -141,16 +161,26 @@ func CreateQuestion(c *gin.Context)  {
 
 	if err := c.ShouldBindJSON(&cq); err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusInternalServerError,
+			"status":  http.StatusInternalServerError,
 			"message": err.Error(),
 		})
 		return
 	}
 
-	question, code, err := cq.Create(value);
+	question, code, err := cq.Create(value)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusNotFound,
+			"status":  http.StatusNotFound,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	p.UserID = question.UserID
+	profile, err := p.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
 			"message": err.Error(),
 		})
 		return
@@ -158,28 +188,28 @@ func CreateQuestion(c *gin.Context)  {
 
 	var questionVO QuestionVO
 	util.SimpleCopyProperties(&questionVO, &question)
-	util.SimpleCopyProperties(&questionVO.QuestionProfile, &question.QuestionProfile)
+	util.SimpleCopyProperties(&questionVO.Questioner, &profile)
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
-		"message": map[string]interface{}{
-			"record": questionVO,
-			"code": code,
-		},
+		"status":  http.StatusOK,
+		"code":    code,
+		"message": "ok",
+		"data":    questionVO,
 	})
 
 }
 
 // GetQuestions 按条件获取问题列表
-func GetQuestions(c *gin.Context)  {
+func GetQuestions(c *gin.Context) {
 
 	var q model.Question
+	var p model.Profile
 	//var limit int
 	//var offset int
 	var err error
 
-	questionProfileID, _ := strconv.Atoi(c.Query("questionProfileID"))
-	q.QuestionProfileID = uint(questionProfileID)
+	userID, _ := strconv.Atoi(c.Query("userID"))
+	q.UserID = uint(userID)
 
 	//limit, err = strconv.Atoi(c.Query("limit"))
 	//if err != nil {
@@ -202,7 +232,7 @@ func GetQuestions(c *gin.Context)  {
 	questions, err := q.GetList()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": http.StatusNotFound,
+			"status":  http.StatusNotFound,
 			"message": err.Error(),
 		})
 		return
@@ -211,16 +241,27 @@ func GetQuestions(c *gin.Context)  {
 	count := 0
 	var questionsVO []QuestionVO
 	for _, q := range questions {
+		p.UserID = q.UserID
+		profile, err := p.Get()
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusNotFound,
+				"message": err.Error(),
+			})
+			return
+		}
+
 		var questionVO QuestionVO
 		util.SimpleCopyProperties(&questionVO, &q)
-		util.SimpleCopyProperties(&questionVO.QuestionProfile, &q.QuestionProfile)
+		util.SimpleCopyProperties(&questionVO.Questioner, &profile)
 		questionsVO = append(questionsVO, questionVO)
 		count++
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
-		"message": questionsVO,
-		"total": count,
+		"status":  http.StatusOK,
+		"message": "ok",
+		"data":    questionsVO,
+		"total":   count,
 	})
 }

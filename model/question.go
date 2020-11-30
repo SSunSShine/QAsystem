@@ -9,15 +9,15 @@ import (
 // Question 问题
 type Question struct {
 	gorm.Model
-	Title             string  `json:"title"`
-	Desc              string  `json:"desc" gorm:"type:varchar(4000)"`
-	QuestionProfileID uint    `json:"questionProfileID"`
-	QuestionProfile   Profile `json:"questionProfile" gorm:"ForeignKey:QuestionProfileID"`
+	Title  string `json:"title" gorm:"type:varchar(50);not null"`
+	Desc   string `json:"desc" gorm:"type:varchar(4000);not null"`
+	UserID uint   `json:"userId"`
+	User   User   `json:"user"  gorm:"ForeignKey:UserID"`
 }
 
 func (q *Question) Get() (question Question, err error) {
 
-	if err = database.DB.Where(&q).Preload("QuestionProfile").First(&question).Error; err != nil {
+	if err = database.DB.Where(&q).Preload("User").First(&question).Error; err != nil {
 		log.Print(err)
 	}
 
@@ -72,7 +72,7 @@ func (q *Question) Count() (count int, err error) {
 // GetList 获取问题列表
 func (q *Question) GetList() (questions []Question, err error) {
 
-	if err = database.DB.Where(&q).Preload("QuestionProfile").Find(&questions).Error; err != nil {
+	if err = database.DB.Where(&q).Preload("User").Find(&questions).Error; err != nil {
 		log.Print(err)
 	}
 

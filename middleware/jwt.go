@@ -14,9 +14,7 @@ import (
 
 type MyClaims struct {
 	ID        uint   `json:"id"`
-	ProfileID uint   `json:"profile_id"`
-	Name      string `json:"name"`
-	Desc      string `json:"desc"`
+	ProfileID uint `json:"profileId"`
 	jwt.StandardClaims
 }
 
@@ -24,13 +22,19 @@ var JwtKey = []byte(conf.Config().JwtKey)
 
 // Gen 生成token
 func Gen(user model.User) (token string, err error) {
+
+	var p model.Profile
+	p.UserID = user.ID
+	profile, err := p.Get()
+	if err != nil {
+		log.Print(err)
+	}
+
 	// token 存活时间 10h
 	expireTime := time.Now().Add(10 * time.Hour)
 	SetClaims := MyClaims{
 		user.ID,
-		user.ProfileID,
-		user.Profile.Name,
-		user.Profile.Desc,
+		profile.ID,
 		jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 			Issuer:    "localhost",

@@ -24,6 +24,7 @@ func InitRouter()  {
 
 		// Profile
 		auth.PUT("profile/:id", api.UpdateProfile)
+		auth.DELETE("profile/:id", api.DeleteProfile)
 
 		// Question
 		auth.PUT("question/:id", api.UpdateQuestion)
