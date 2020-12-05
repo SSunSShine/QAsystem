@@ -39,7 +39,7 @@ redis:
 jwtKey: jwt123456
 
 # 端口
-address: :9090
+address: :8080
 ```
 
 ### 4.初始化并运行
