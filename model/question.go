@@ -24,37 +24,28 @@ func (q *Question) Get() (question Question, err error) {
 	return
 }
 
-func (q *Question) Create() (code int, err error) {
+func (q *Question) Create() (err error) {
 
 	if err = database.DB.Create(&q).Error; err != nil {
-		code = -1
 		log.Print(err)
-	} else {
-		code = 1
 	}
 
 	return
 }
 
-func (q *Question) Update() (code int, err error) {
+func (q *Question) Update() (err error) {
 
 	if err = database.DB.Model(&q).Updates(q).Error; err != nil {
-		code = -1
 		log.Print(err)
-	} else {
-		code = 1
 	}
 
 	return
 }
 
-func (q *Question) Delete() (code int, err error) {
+func (q *Question) Delete() ( err error) {
 
 	if err = database.DB.Unscoped().Delete(&q).Error; err != nil {
-		code = -1
 		log.Print(err)
-	} else {
-		code = 1
 	}
 
 	return

@@ -6,6 +6,7 @@ import (
 	"reflect"
 )
 
+// SimpleCopyProperties 复制结构体相同字段
 func SimpleCopyProperties(dst, src interface{}) (err error) {
 	// 防止意外panic
 	defer func() {
