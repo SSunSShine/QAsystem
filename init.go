@@ -34,7 +34,7 @@ func initAll(conf *conf.Configuration)  {
 	database.DB.AutoMigrate(&model.Profile{})
 	database.DB.AutoMigrate(&model.Question{})
 
-	u0 := model.User{Mail: "123456@123.com", Password: "123456"}
+	u0 := model.User{Mail: "123456@163.com", Password: "123456", Phone: "13212341234"}
 	u0.Create()
 
 	p0 := model.Profile{Name: "admin",Gender: 1, Desc: "This is the first account.", UserID: u0.ID}

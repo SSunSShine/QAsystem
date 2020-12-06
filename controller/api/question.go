@@ -59,7 +59,7 @@ func GetQuestion(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
-		"message": "ok",
+		"message": "success",
 		"data":    questionVO,
 	})
 }
@@ -79,7 +79,7 @@ func UpdateQuestion(c *gin.Context) {
 		return
 	}
 
-	if code, err := q.Update(); err != nil {
+	if err := q.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
 			"message": err.Error(),
@@ -87,7 +87,7 @@ func UpdateQuestion(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusOK,
-			"message": code,
+			"message": "success",
 		})
 	}
 
@@ -100,7 +100,7 @@ func DeleteQuestion(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	q.ID = uint(id)
 
-	if code, err := q.Delete(); err != nil {
+	if err := q.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
 			"message": err.Error(),
@@ -108,7 +108,7 @@ func DeleteQuestion(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusOK,
-			"message": code,
+			"message": "success",
 		})
 	}
 }
@@ -129,7 +129,7 @@ func GetQuestionsCount(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusOK,
-			"message": "ok",
+			"message": "success",
 			"data":    count,
 		})
 	}
@@ -140,7 +140,7 @@ func CreateQuestion(c *gin.Context) {
 	var cq service.CreateQuestionInterface
 	var p model.Profile
 
-	ProfileID, exist := c.Get("pid")
+	UserID, exist := c.Get("uid")
 	if !exist {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
@@ -149,7 +149,7 @@ func CreateQuestion(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	value, ok := ProfileID.(uint)
+	value, ok := UserID.(uint)
 	if !ok {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
@@ -167,7 +167,7 @@ func CreateQuestion(c *gin.Context) {
 		return
 	}
 
-	question, code, err := cq.Create(value)
+	question, err := cq.Create(value)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
@@ -192,8 +192,7 @@ func CreateQuestion(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
-		"code":    code,
-		"message": "ok",
+		"message": "success",
 		"data":    questionVO,
 	})
 
@@ -260,7 +259,7 @@ func GetQuestions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
-		"message": "ok",
+		"message": "success",
 		"data":    questionsVO,
 		"total":   count,
 	})

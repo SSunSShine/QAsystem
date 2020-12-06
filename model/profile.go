@@ -24,35 +24,26 @@ func (p *Profile) Get() (profile Profile, err error) {
 	return
 }
 
-func (p *Profile) Create() (code int, err error) {
+func (p *Profile) Create() (err error) {
 
 	if err = database.DB.Create(&p).Error; err != nil {
-		code = -1
 		log.Print(err)
-	} else {
-		code = 1
 	}
 	return
 }
 
-func (p *Profile) Update() (code int, err error) {
+func (p *Profile) Update() (err error) {
 
 	if err = database.DB.Model(&p).Updates(p).Error; err != nil {
-		code = -1
 		log.Print(err)
-	} else {
-		code = 1
 	}
 	return
 }
 
-func (p *Profile) Delete() (code int, err error) {
+func (p *Profile) Delete() (err error) {
 
 	if err = database.DB.Unscoped().Delete(&p).Error; err != nil {
-		code = -1
 		log.Print(err)
-	} else {
-		code = 1
 	}
 	return
 }

@@ -41,7 +41,7 @@ func GetProfile(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
-		"message": "ok",
+		"message": "success",
 		"data": profileVO,
 	})
 }
@@ -60,7 +60,7 @@ func UpdateProfile(c *gin.Context) {
 		})
 		return
 	}
-	if code, err := p.Update(); err != nil {
+	if err := p.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
 			"message": err.Error(),
@@ -68,7 +68,7 @@ func UpdateProfile(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusOK,
-			"message": code,
+			"message": "success",
 		})
 	}
 }
@@ -85,7 +85,7 @@ func GetProfilesCount(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusOK,
-			"message": "ok",
+			"message": "success",
 			"data": count,
 		})
 	}
@@ -108,7 +108,7 @@ func DeleteProfile(c *gin.Context)  {
 		return
 	}
 
-	if code, err := profile.Delete(); err != nil {
+	if err := profile.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusNotFound,
 			"message": err.Error(),
@@ -116,7 +116,7 @@ func DeleteProfile(c *gin.Context)  {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
-			"message": code,
+			"message": "success",
 		})
 	}
 }

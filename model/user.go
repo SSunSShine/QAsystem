@@ -12,6 +12,7 @@ type User struct {
 	gorm.Model
 	Mail      string  `json:"mail" gorm:"type:varchar(100);unique_index;not null"`
 	Password  string  `json:"password" gorm:"type:varchar(100);not null"`
+	Phone     string  `json:"phone" gorm:"type:varchar(11);not null"`
 }
 
 func (u *User) Get() (user User, err error) {
@@ -23,37 +24,28 @@ func (u *User) Get() (user User, err error) {
 	return
 }
 
-func (u *User) Create() (code int, err error) {
+func (u *User) Create() (err error) {
 
 	if err = database.DB.Create(&u).Error; err != nil {
-		code = -1
 		log.Print(err)
-	} else {
-		code = 1
 	}
 
 	return
 }
 
-func (u *User) Update() (code int, err error) {
+func (u *User) Update() (err error) {
 
 	if err = database.DB.Model(&u).Updates(u).Error; err != nil {
-		code = -1
 		log.Print(err)
-	} else {
-		code = 1
 	}
 
 	return
 }
 
-func (u *User) Delete() (code int, err error) {
+func (u *User) Delete() (err error) {
 
 	if err = database.DB.Unscoped().Delete(&u).Error; err != nil {
-		code = -1
 		log.Print(err)
-	} else {
-		code = 1
 	}
 
 	return

@@ -14,6 +14,7 @@ type UserVO struct {
 	ID        uint      `json:"id"`
 	Mail      string    `json:"mail"`
 	Password  string    `json:"password"`
+	Phone     string	`json:"phone"`
 }
 
 // GetUser 获取单个用户信息
@@ -34,11 +35,18 @@ func GetUser(c *gin.Context) {
 		return
 	}
 	var userVO UserVO
-	util.SimpleCopyProperties(&userVO, &user)
+	err = util.SimpleCopyProperties(&userVO, &user)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"status": http.StatusOK,
-		"message": "ok",
+		"message": "success",
 		"data": userVO,
 	})
 
@@ -60,7 +68,7 @@ func UpdateUser(c *gin.Context)  {
 	}
 
 
-	if code, err := u.Update(); err != nil {
+	if err := u.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusNotFound,
 			"message": err.Error(),
@@ -68,7 +76,7 @@ func UpdateUser(c *gin.Context)  {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
-			"message": code,
+			"message": "success",
 		})
 	}
 }
@@ -90,7 +98,7 @@ func DeleteUser(c *gin.Context)  {
 		return
 	}
 
-	if code, err := user.Delete(); err != nil {
+	if err := user.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusNotFound,
 			"message": err.Error(),
@@ -98,7 +106,7 @@ func DeleteUser(c *gin.Context)  {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
-			"message": code,
+			"message": "success",
 		})
 	}
 }
@@ -116,7 +124,7 @@ func GetUsersCount(c *gin.Context)  {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
-			"message": "ok",
+			"message": "success",
 			"data": count,
 		})
 	}
@@ -134,7 +142,7 @@ func Sign(c *gin.Context)  {
 		})
 	}
 
-	if code, err := s.Sign(); err != nil {
+	if err := s.Sign(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
 			"message": err.Error(),
@@ -142,7 +150,7 @@ func Sign(c *gin.Context)  {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
-			"message": code,
+			"message": "success",
 		})
 	}
 }
@@ -160,7 +168,7 @@ func Login(c *gin.Context)  {
 		return
 	}
 
-	code, user, err := l.Login()
+	user, err := l.Login()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
@@ -179,7 +187,7 @@ func Login(c *gin.Context)  {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status": http.StatusOK,
-		"message": code,
+		"message": "success",
 		"token": token,
 	})
 }
