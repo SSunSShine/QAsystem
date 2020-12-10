@@ -1,15 +1,12 @@
 package route
 
 import (
-	"github.com/SSunSShine/QAsystem/conf"
 	"github.com/SSunSShine/QAsystem/controller/api"
 	"github.com/SSunSShine/QAsystem/middleware"
 	"github.com/gin-gonic/gin"
 )
 
-func InitRouter()  {
-
-	r := gin.Default()
+func InitRouter(r *gin.Engine)  {
 
 	r.Use(middleware.Logger())
 	r.Use(gin.Recovery())
@@ -50,5 +47,4 @@ func InitRouter()  {
 		router.GET("questions/list", api.GetQuestions)
 	}
 
-	r.Run(conf.Config().Address)
 }

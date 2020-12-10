@@ -47,3 +47,16 @@ address: :8080
 ```shell
 $ (sudo) go run ./ -init
 ```
+
+#### 5.技术栈
+
+| 技术              | 链接                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| gin               | https://github.com/gin-gonic/gin                             |
+| gorm              | https://github.com/jinzhu/gorm                               |
+| viper             | https://github.com/spf13/viper                               |
+| go-redis          | https://github.com/go-redis/redis/v8                         |
+| validator         | https://github.com/go-playground/validator/v10               |
+| jwt-go            | https://github.com/dgrijalva/jwt-go                          |
+| bcrypt            | https://golang.org/x/crypto/bcrypt                           |
+| httpexpect        | https://github.com/gavv/httpexpect/v2                                |
