@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/SSunSShine/QAsystem/conf"
 	"github.com/SSunSShine/QAsystem/route"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -14,6 +15,7 @@ func main() {
 	if *shouldInit {
 		initAll(conf.Config())
 	}
-
-	route.InitRouter()
+	r := gin.Default()
+	route.InitRouter(r)
+	r.Run(conf.Config().Address)
 }
