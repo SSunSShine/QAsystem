@@ -1,11 +1,11 @@
 # 数据库
 db:
   driver: mysql
-  addr: root:123456@tcp(127.0.0.1:3306)/qasystem?charset=utf8&parseTime=True&loc=Local
+  addr: root:root1234@tcp(mysql8019:3306)/qasystem?charset=utf8&parseTime=True&loc=Local
 
 # Redis
 redis:
-  addr: 127.0.0.1:6379
+  addr: redis-db:6379
   password:
   db: 0
 
