@@ -4,6 +4,12 @@
 
 目前正在完善中。。。
 
+## Docker 快速部署
+
+```shell
+$ docker-compose up
+```
+
 ### 1.获取代码
 
 ```shell
@@ -59,4 +65,5 @@ $ (sudo) go run ./ -init
 | validator         | https://github.com/go-playground/validator/v10               |
 | jwt-go            | https://github.com/dgrijalva/jwt-go                          |
 | bcrypt            | https://golang.org/x/crypto/bcrypt                           |
-| httpexpect        | https://github.com/gavv/httpexpect/v2                                |
+| httpexpect        | https://github.com/gavv/httpexpect/v2                        |
+| docker            | https://docs.docker.com/                                     |
