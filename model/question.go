@@ -9,10 +9,11 @@ import (
 // Question 问题
 type Question struct {
 	gorm.Model
-	Title  string `json:"title" gorm:"type:varchar(50);not null"`
-	Desc   string `json:"desc" gorm:"type:varchar(4000);not null"`
-	UserID uint   `json:"userId"`
-	User   User   `json:"user"  gorm:"ForeignKey:UserID"`
+	Title        string   `json:"title" gorm:"type:varchar(50);not null"`
+	Desc         string   `json:"desc" gorm:"type:varchar(4000);not null"`
+	UserID       uint     `json:"userId"`
+	User         User     `json:"user"  gorm:"ForeignKey:UserID"`
+	AnswersCount int      `json:"answersCount"`
 }
 
 func (q *Question) Get() (question Question, err error) {
@@ -42,7 +43,7 @@ func (q *Question) Update() (err error) {
 	return
 }
 
-func (q *Question) Delete() ( err error) {
+func (q *Question) Delete() (err error) {
 
 	if err = database.DB.Unscoped().Delete(&q).Error; err != nil {
 		log.Print(err)
@@ -67,5 +68,17 @@ func (q *Question) GetList() (questions []Question, err error) {
 		log.Print(err)
 	}
 
+	return
+}
+
+// AfterDelete 级联删除回答下的问题
+func (q *Question) AfterDelete(db *gorm.DB) (err error) {
+
+	var a Answer
+	a.QuestionID = q.ID
+
+	if err = db.Where(&a).Delete(&a).Error; err != nil {
+		log.Print(err)
+	}
 	return
 }

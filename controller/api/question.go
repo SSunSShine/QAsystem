@@ -11,12 +11,13 @@ import (
 )
 
 type QuestionVO struct {
-	ID         uint       `json:"id"`
-	Title      string     `json:"title"`
-	Desc       string     `json:"desc"`
-	Questioner Questioner `json:"questioner"`
-	CreatedAt  time.Time  `json:"createdAt"`
-	UpdatedAt  time.Time  `json:"updatedAt"`
+	ID           uint       `json:"id"`
+	Title        string     `json:"title"`
+	Desc         string     `json:"desc"`
+	Questioner   Questioner `json:"questioner"`
+	AnswersCount int        `json:"answersCount"`
+	CreatedAt    time.Time  `json:"createdAt"`
+	UpdatedAt    time.Time  `json:"updatedAt"`
 }
 
 type Questioner struct {
@@ -203,30 +204,10 @@ func GetQuestions(c *gin.Context) {
 
 	var q model.Question
 	var p model.Profile
-	//var limit int
-	//var offset int
 	var err error
 
 	userID, _ := strconv.Atoi(c.Query("userID"))
 	q.UserID = uint(userID)
-
-	//limit, err = strconv.Atoi(c.Query("limit"))
-	//if err != nil {
-	//	c.JSON(http.StatusOK, gin.H{
-	//		"status": http.StatusInternalServerError,
-	//		"message": err.Error(),
-	//	})
-	//	return
-	//}
-	//
-	//offset, err = strconv.Atoi(c.Query("offset"))
-	//if err != nil {
-	//	c.JSON(http.StatusOK, gin.H{
-	//		"status": http.StatusInternalServerError,
-	//		"message": err.Error(),
-	//	})
-	//	return
-	//}
 
 	questions, err := q.GetList()
 	if err != nil {

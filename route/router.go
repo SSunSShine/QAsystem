@@ -27,6 +27,11 @@ func InitRouter(r *gin.Engine)  {
 		auth.PUT("question/:id", api.UpdateQuestion)
 		auth.DELETE("question/:id", api.DeleteQuestion)
 		auth.POST("question/create", api.CreateQuestion)
+
+		// Answer
+		auth.POST("answer/create", api.CreateAnswer)
+		auth.PUT("answer/:id", api.UpdateAnswer)
+		auth.DELETE("answer/:id", api.DeleteAnswer)
 	}
 	router := r.Group("/api")
 	{
@@ -45,6 +50,12 @@ func InitRouter(r *gin.Engine)  {
 		router.GET("question/:id", api.GetQuestion)
 		router.GET("questions/count", api.GetQuestionsCount)
 		router.GET("questions/list", api.GetQuestions)
+
+		// Answer
+		router.GET("answer/:id", api.GetAnswer)
+		router.GET("answers/count", api.GetAnswersCount)
+		router.GET("answers/listByQuestion", api.GetAnswersByQuestion)
+		router.GET("answers/listByUser", api.GetAnswersByUser)
 	}
 
 }

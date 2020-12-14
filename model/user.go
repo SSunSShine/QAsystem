@@ -76,18 +76,3 @@ func (u *User) AfterCreate(db *gorm.DB) (err error) {
 	return
 }
 
-// AfterUpdate 密码加密
-func (u *User) AfterUpdate(db *gorm.DB) (err error) {
-
-	password, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Print(err)
-		return
-	}
-
-	if err = db.Model(&u).UpdateColumn("password", string(password)).Error; err != nil {
-		log.Print(err)
-	}
-
-	return
-}
