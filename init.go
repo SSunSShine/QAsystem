@@ -30,9 +30,15 @@ func initAll(conf *conf.Configuration)  {
 		database.DB.DropTable(&model.Question{})
 	}
 
+	if (database.DB.HasTable(&model.Answer{})) {
+		fmt.Println("db has the table answer, so drop it.")
+		database.DB.DropTable(&model.Answer{})
+	}
+
 	database.DB.AutoMigrate(&model.User{})
 	database.DB.AutoMigrate(&model.Profile{})
 	database.DB.AutoMigrate(&model.Question{})
+	database.DB.AutoMigrate(&model.Answer{})
 
 	u0 := model.User{Mail: "123456@163.com", Password: "123456", Phone: "13212341234"}
 	u0.Create()
@@ -41,9 +47,11 @@ func initAll(conf *conf.Configuration)  {
 	p0.Create()
 
 
-	q1 := model.Question{Title: "First Question", Desc: "This is the first question !", UserID: u0.ID}
-	q1.Create()
+	q0 := model.Question{Title: "First Question", Desc: "This is the first question !", UserID: u0.ID}
+	q0.Create()
 
+	a0 := model.Answer{Content: "This is the first answer!", QuestionID: q0.ID, UserID: u0.ID}
+	a0.Create()
 
 	fmt.Println("restarted success !")
 }

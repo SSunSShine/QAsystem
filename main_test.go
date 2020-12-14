@@ -72,13 +72,6 @@ func TestUser(t *testing.T)  {
 		Status(http.StatusOK).
 		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
 
-	// 删除用户
-	e.DELETE("/api/user/2").
-		WithHeader("Authorization", token).
-		Expect().
-		Status(http.StatusOK).
-		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
-
 }
 
 func TestProfile(t *testing.T)  {
@@ -112,6 +105,13 @@ func TestProfile(t *testing.T)  {
 
 	// 获取个人问题列表
 	e.GET("/api/questions/list").WithQuery("userID", 1).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 注销
+	e.DELETE("/api/profile/2").
 		WithHeader("Authorization", token).
 		Expect().
 		Status(http.StatusOK).
@@ -165,4 +165,73 @@ func TestQuestion(t *testing.T)  {
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 删除问题
+	e.DELETE("/api/question/2").
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+}
+
+func TestAnswer(t *testing.T)  {
+
+	e := httpexpect.New(t, server.URL)
+
+	// 获取回答信息
+	e.GET("/api/answer/1").
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 回答问题
+	e.POST("/api/answer/create").WithQuery("questionID", 1).
+		WithJSON(map[string]interface{}{
+			"content": "Test Answer",
+		}).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 修改回答
+	e.PUT("/api/answer/2").
+		WithJSON(map[string]interface{}{
+			"content": "Test Answer11111",
+		}).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 获取某用户回答数量
+	e.GET("/api/answers/count").WithQuery("userID", 1).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 获取某用户回答列表
+	e.GET("/api/answers/listByUser").WithQuery("userID", 1).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 获取某问题回答列表
+	e.GET("/api/answers/listByQuestion").WithQuery("questionID", 1).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 删除回答
+	// 注销
+	e.DELETE("/api/answer/2").
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
 }
