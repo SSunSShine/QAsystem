@@ -35,10 +35,16 @@ func initAll(conf *conf.Configuration)  {
 		database.DB.DropTable(&model.Answer{})
 	}
 
+	if (database.DB.HasTable(&model.Voter{})) {
+		fmt.Println("db has the table voter, so drop it.")
+		database.DB.DropTable(&model.Voter{})
+	}
+
 	database.DB.AutoMigrate(&model.User{})
 	database.DB.AutoMigrate(&model.Profile{})
 	database.DB.AutoMigrate(&model.Question{})
 	database.DB.AutoMigrate(&model.Answer{})
+	database.DB.AutoMigrate(&model.Voter{})
 
 	u0 := model.User{Mail: "123456@163.com", Password: "123456", Phone: "13212341234"}
 	u0.Create()

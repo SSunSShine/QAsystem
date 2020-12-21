@@ -9,11 +9,14 @@ import (
 // Answer 问题回答
 type Answer struct {
 	gorm.Model
-	Content    string   `json:"content" gorm:"type:varchar(4000)"`
-	QuestionID uint     `json:"questionId"`
-	Question   Question `json:"question" gorm:"ForeignKey:QuestionID"`
-	UserID     uint     `json:"userId"`
-	User       User     `json:"user"  gorm:"ForeignKey:UserID"`
+	Content         string   `json:"content" gorm:"type:varchar(4000)"`
+	QuestionID      uint     `json:"questionId"`
+	Question        Question `json:"question" gorm:"ForeignKey:QuestionID"`
+	UserID          uint     `json:"userId"`
+	User            User     `json:"user"  gorm:"ForeignKey:UserID"`
+	Voters          []Voter  `json:"-"`
+	SupportersCount int      `json:"supportersCount"`	 // 只统计点赞数
+	Voted           int      `json:"voted" gorm:"-"`     // 1 赞， 0 未投票， -1 踩
 }
 
 func (a *Answer) Get() (answer Answer, err error) {
@@ -56,6 +59,15 @@ func (a *Answer) GetList() (answers []Answer, err error) {
 	return
 }
 
+func (a *Answer) GetOrderList(order string) (answers []Answer, err error) {
+
+	if err = database.DB.Preload("Question").Preload("User").Order(order).Find(&answers, a).Error; err != nil {
+		log.Print(err)
+	}
+
+	return
+}
+
 func (a *Answer) Count() (count int, err error) {
 
 	if err = database.DB.Model(&a).Where(&a).Count(&count).Error; err != nil {
@@ -76,13 +88,20 @@ func (a *Answer) AfterCreate(db *gorm.DB) (err error) {
 	return
 }
 
-// AfterCreate 问题下回答数量 - 1
+// AfterDelete 问题下回答数量 - 1, 级联删除点赞，点踩记录
 func (a *Answer) AfterDelete(db *gorm.DB) (err error) {
 
 	var q Question
 	q.ID = a.QuestionID
 
 	if err = db.Model(&q).UpdateColumn("answers_count", gorm.Expr("answers_count - ?", 1)).Error; err != nil {
+		log.Print(err)
+	}
+
+	var v Voter
+	v.AnswerID = a.ID
+
+	if err = db.Where(&v).Unscoped().Delete(&v).Error; err != nil {
 		log.Print(err)
 	}
 	return

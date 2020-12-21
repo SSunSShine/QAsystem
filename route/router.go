@@ -32,6 +32,10 @@ func InitRouter(r *gin.Engine)  {
 		auth.POST("answer/create", api.CreateAnswer)
 		auth.PUT("answer/:id", api.UpdateAnswer)
 		auth.DELETE("answer/:id", api.DeleteAnswer)
+
+		// Voter
+		auth.POST("voter/:answerID", api.CreateVoter)
+		auth.DELETE("voter/:answerID", api.DeleteVoter)
 	}
 	router := r.Group("/api")
 	{
@@ -56,6 +60,7 @@ func InitRouter(r *gin.Engine)  {
 		router.GET("answers/count", api.GetAnswersCount)
 		router.GET("answers/listByQuestion", api.GetAnswersByQuestion)
 		router.GET("answers/listByUser", api.GetAnswersByUser)
+		router.GET("answers/listByVoter", api.GetAnswersByVoter)
 	}
 
 }

@@ -71,13 +71,22 @@ func (q *Question) GetList() (questions []Question, err error) {
 	return
 }
 
-// AfterDelete 级联删除回答下的问题
+func (q *Question) GetOrderList(order string) (questions []Question, err error) {
+
+	if err = database.DB.Preload("User").Order(order).Find(&questions, q).Error; err != nil {
+		log.Print(err)
+	}
+
+	return
+}
+
+// AfterDelete 级联删除问题下的回答
 func (q *Question) AfterDelete(db *gorm.DB) (err error) {
 
 	var a Answer
 	a.QuestionID = q.ID
 
-	if err = db.Where(&a).Delete(&a).Error; err != nil {
+	if err = db.Where(&a).Unscoped().Delete(&a).Error; err != nil {
 		log.Print(err)
 	}
 	return

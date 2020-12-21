@@ -226,6 +226,13 @@ func TestAnswer(t *testing.T)  {
 		Status(http.StatusOK).
 		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
 
+	// 获取某用户点赞的回答列表
+	e.GET("/api/answers/listByVoter").WithQuery("voterID", 1).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
 	// 删除回答
 	// 注销
 	e.DELETE("/api/answer/2").
@@ -234,4 +241,23 @@ func TestAnswer(t *testing.T)  {
 		Status(http.StatusOK).
 		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
 
+}
+
+func TestVoter(t *testing.T)  {
+
+	e := httpexpect.New(t, server.URL)
+
+	// 点赞
+	e.POST("/api/voter/1").WithQuery("upOrDown", "true").
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 取消点赞
+	e.DELETE("/api/voter/1").WithQuery("upOrDown", "true").
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
 }
