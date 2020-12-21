@@ -204,18 +204,37 @@ func GetQuestions(c *gin.Context) {
 
 	var q model.Question
 	var p model.Profile
+	var questions []model.Question
 	var err error
 
 	userID, _ := strconv.Atoi(c.Query("userID"))
 	q.UserID = uint(userID)
 
-	questions, err := q.GetList()
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  http.StatusNotFound,
-			"message": err.Error(),
-		})
-		return
+	order := c.Query("order")
+	if order == "answers_count" {
+		if questions, err = q.GetOrderList("answers_count desc"); err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusNotFound,
+				"message": err.Error(),
+			})
+			return
+		}
+	} else if order == "update_time" {
+		if questions, err = q.GetOrderList("updated_at desc"); err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusNotFound,
+				"message": err.Error(),
+			})
+			return
+		}
+	} else {
+		if questions, err = q.GetList(); err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusNotFound,
+				"message": err.Error(),
+			})
+			return
+		}
 	}
 
 	count := 0
