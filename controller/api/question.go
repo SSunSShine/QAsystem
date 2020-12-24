@@ -16,6 +16,7 @@ type QuestionVO struct {
 	Desc         string     `json:"desc"`
 	Questioner   Questioner `json:"questioner"`
 	AnswersCount int        `json:"answersCount"`
+	ViewCount	 int		`json:"viewCount"`
 	CreatedAt    time.Time  `json:"createdAt"`
 	UpdatedAt    time.Time  `json:"updatedAt"`
 }
@@ -32,7 +33,8 @@ func GetQuestion(c *gin.Context) {
 	var q model.Question
 	var p model.Profile
 
-	id, _ := strconv.Atoi(c.Param("id"))
+	qid := c.Param("id")
+	id, _ := strconv.Atoi(qid)
 	q.ID = uint(id)
 
 	question, err := q.Get()
@@ -46,6 +48,16 @@ func GetQuestion(c *gin.Context) {
 
 	p.UserID = q.UserID
 	profile, err := p.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// 增加浏览量记录到redis
+	err = service.IncrView(qid)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,

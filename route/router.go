@@ -3,6 +3,7 @@ package route
 import (
 	"github.com/SSunSShine/QAsystem/controller/api"
 	"github.com/SSunSShine/QAsystem/middleware"
+	"github.com/SSunSShine/QAsystem/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -62,5 +63,8 @@ func InitRouter(r *gin.Engine)  {
 		router.GET("answers/listByUser", api.GetAnswersByUser)
 		router.GET("answers/listByVoter", api.GetAnswersByVoter)
 	}
+
+	// 启动goroutine异步更新数据库
+	go service.RunViewConsumer()
 
 }
