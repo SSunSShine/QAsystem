@@ -14,6 +14,7 @@ type Question struct {
 	UserID       uint     `json:"userId"`
 	User         User     `json:"user"  gorm:"ForeignKey:UserID"`
 	AnswersCount int      `json:"answersCount"`
+	ViewCount	 int	  `json:"viewCount"`
 }
 
 func (q *Question) Get() (question Question, err error) {
@@ -77,6 +78,15 @@ func (q *Question) GetOrderList(order string) (questions []Question, err error) 
 		log.Print(err)
 	}
 
+	return
+}
+
+// IncrView 浏览数+1
+func (q *Question) IncrView() (err error) {
+
+	if err := database.DB.Model(&q).UpdateColumn("view_count", gorm.Expr("view_count + ?", 1)).Error; err != nil {
+		log.Print(err)
+	}
 	return
 }
 

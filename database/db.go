@@ -20,5 +20,9 @@ func init() {
 		panic("failed to connect database !")
 	}
 
+	// 设置连接池连接数
+	DB.DB().SetMaxOpenConns(150)
+	DB.DB().SetMaxIdleConns(100)
+
 	DB.SingularTable(true)
 }
