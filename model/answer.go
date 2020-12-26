@@ -76,18 +76,6 @@ func (a *Answer) Count() (count int, err error) {
 	return
 }
 
-// AfterCreate 问题下回答数量 + 1
-func (a *Answer) AfterCreate(db *gorm.DB) (err error) {
-
-	var q Question
-	q.ID = a.QuestionID
-
-	if err = db.Model(&q).UpdateColumn("answers_count", gorm.Expr("answers_count + ?", 1)).Error; err != nil {
-		log.Print(err)
-	}
-	return
-}
-
 // AfterDelete 问题下回答数量 - 1, 级联删除点赞，点踩记录
 func (a *Answer) AfterDelete(db *gorm.DB) (err error) {
 

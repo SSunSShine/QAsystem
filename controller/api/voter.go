@@ -4,9 +4,13 @@ import (
 	"github.com/SSunSShine/QAsystem/model"
 	"github.com/SSunSShine/QAsystem/service"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 )
+
+const maxMessageNum = 2000
+var answerChan = make(chan uint, maxMessageNum)
 
 func CreateVoter(c *gin.Context)  {
 
@@ -51,6 +55,9 @@ func CreateVoter(c *gin.Context)  {
 		})
 		return
 	}
+
+	// 通知异步更新 MySQL answer表
+	answerChan <- v.AnswerID
 
 	if err = v.Create(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -122,4 +129,19 @@ func DeleteVoter(c *gin.Context)  {
 		})
 	}
 	return
+}
+
+// UpdateSupporters 异步更新MySQL
+func UpdateSupporters()  {
+	for {
+		select {
+		case updateData := <-answerChan:
+			var a model.Answer
+			a.ID = updateData
+			err := a.IncrSupporters()
+			if err != nil {
+				log.Print(err)
+			}
+		}
+	}
 }

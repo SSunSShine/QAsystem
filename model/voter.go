@@ -41,16 +41,12 @@ func (v *Voter) GetList() (voters []Voter, err error) {
 	return
 }
 
-func (v *Voter) AfterCreate(db *gorm.DB) (err error) {
+// IncrSupporters 点赞数+1
+func (a *Answer) IncrSupporters() (err error) {
 
-	var a Answer
-	a.ID = v.AnswerID
-	if v.UpOrDown {
-		if err = db.Model(&a).UpdateColumn("supporters_count", gorm.Expr("supporters_count + ?", 1)).Error; err != nil {
-			log.Print(err)
-		}
+	if err := database.DB.Model(&a).UpdateColumn("supporters_count", gorm.Expr("supporters_count + ?", 1)).Error; err != nil {
+		log.Print(err)
 	}
-
 	return
 }
 

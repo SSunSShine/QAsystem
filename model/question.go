@@ -81,6 +81,15 @@ func (q *Question) GetOrderList(order string) (questions []Question, err error) 
 	return
 }
 
+// IncrAnswersCount 回答数+1
+func (q *Question) IncrAnswersCount() (err error) {
+
+	if err := database.DB.Model(&q).UpdateColumn("answers_count", gorm.Expr("answers_count + ?", 1)).Error; err != nil {
+		log.Print(err)
+	}
+	return
+}
+
 // IncrView 浏览数+1
 func (q *Question) IncrView() (err error) {
 
