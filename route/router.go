@@ -65,6 +65,7 @@ func InitRouter(r *gin.Engine)  {
 	}
 
 	// 启动goroutine异步更新数据库
-	go service.RunViewConsumer()
-
+	go service.UpdateAnswersCount()
+	go service.UpdateViews()
+	go api.UpdateSupporters()
 }

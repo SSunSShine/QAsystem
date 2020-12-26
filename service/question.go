@@ -17,8 +17,9 @@ type CreateQuestionInterface struct {
 }
 
 var ZSetKey = "question"
-const maxMessageNum = 2000
-var ChData = make(chan uint, maxMessageNum)
+const maxMessageNum = 20000
+var viewChan = make(chan uint, maxMessageNum)
+
 
 func (cq *CreateQuestionInterface) Create(UserID uint) (q model.Question, err error) {
 
@@ -60,16 +61,16 @@ func IncrView(qid string) (err error) {
 	if err != nil {
 		return
 	}
-	ChData <- uint(id)
+	viewChan <- uint(id)
 
 	return
 }
 
-// updateViews 异步更新MySQL
-func updateViews()  {
+// UpdateViews 异步更新MySQL
+func UpdateViews()  {
 	for {
 		select {
-		case updateData := <-ChData:
+		case updateData := <-viewChan:
 			var q model.Question
 			q.ID = updateData
 			err := q.IncrView()
@@ -77,14 +78,5 @@ func updateViews()  {
 				log.Print(err)
 			}
 		}
-	}
-}
-
-var isConsumerRun = false
-func RunViewConsumer() {
-	// Only Run one consumer.
-	if !isConsumerRun {
-		go updateViews()  //开启一个消费者goroutune，作用是接收redis的改动信息，更新数据库
-		isConsumerRun = true
 	}
 }
