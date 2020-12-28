@@ -5,6 +5,7 @@ import (
 	"github.com/SSunSShine/QAsystem/middleware"
 	"github.com/SSunSShine/QAsystem/service"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 func InitRouter(r *gin.Engine)  {
@@ -30,6 +31,7 @@ func InitRouter(r *gin.Engine)  {
 		auth.POST("question/create", api.CreateQuestion)
 
 		// Answer
+		auth.GET("answer/:id", api.GetAnswer)
 		auth.POST("answer/create", api.CreateAnswer)
 		auth.PUT("answer/:id", api.UpdateAnswer)
 		auth.DELETE("answer/:id", api.DeleteAnswer)
@@ -55,9 +57,9 @@ func InitRouter(r *gin.Engine)  {
 		router.GET("question/:id", api.GetQuestion)
 		router.GET("questions/count", api.GetQuestionsCount)
 		router.GET("questions/list", api.GetQuestions)
+		router.GET("questions/topQ", api.GetTopQ)
 
 		// Answer
-		router.GET("answer/:id", api.GetAnswer)
 		router.GET("answers/count", api.GetAnswersCount)
 		router.GET("answers/listByQuestion", api.GetAnswersByQuestion)
 		router.GET("answers/listByUser", api.GetAnswersByUser)
@@ -68,4 +70,5 @@ func InitRouter(r *gin.Engine)  {
 	go service.UpdateAnswersCount()
 	go service.UpdateViews()
 	go api.UpdateSupporters()
+	go service.UpdateTopQ(time.Minute)
 }
