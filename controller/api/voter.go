@@ -56,8 +56,10 @@ func CreateVoter(c *gin.Context)  {
 		return
 	}
 
-	// 通知异步更新 MySQL answer表
-	answerChan <- v.AnswerID
+	if v.UpOrDown {
+		// 通知异步更新 MySQL answer表
+		answerChan <- v.AnswerID
+	}
 
 	if err = v.Create(); err != nil {
 		c.JSON(http.StatusOK, gin.H{

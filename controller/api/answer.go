@@ -55,17 +55,8 @@ func GetAnswer(c *gin.Context) {
 	}
 
 	// 当前查看回答的用户是否点赞或者点踩
-	if UID, exist := c.GetQuery("userID"); exist {
-		uid, err := strconv.Atoi(UID)
-		if err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  http.StatusNotFound,
-				"message": "Not uint",
-			})
-			c.Abort()
-			return
-		}
-		if err = service.WrapVoted(&answer, uint(uid)); err != nil {
+	if UID, exist := c.Get("uid"); exist {
+		if err = service.WrapVoted(&answer, UID.(uint)); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status": http.StatusInternalServerError,
 				"message": err.Error(),
@@ -243,8 +234,8 @@ func GetAnswersByUser(c *gin.Context) {
 			})
 			return
 		}
-	} else if order == "update_time" {
-		if answers, err = a.GetOrderList("updated_at desc"); err != nil {
+	} else if order == "create_time" {
+		if answers, err = a.GetOrderList("created_at desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
 				"message": err.Error(),
@@ -311,8 +302,8 @@ func GetAnswersByQuestion(c *gin.Context) {
 			})
 			return
 		}
-	} else if order == "update_time" {
-		if answers, err = a.GetOrderList("updated_at desc"); err != nil {
+	} else if order == "create_time" {
+		if answers, err = a.GetOrderList("created_at desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
 				"message": err.Error(),

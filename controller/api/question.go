@@ -223,7 +223,15 @@ func GetQuestions(c *gin.Context) {
 	q.UserID = uint(userID)
 
 	order := c.Query("order")
-	if order == "answers_count" {
+	if order == "view_count" {
+		if questions, err = q.GetOrderList("view_count desc"); err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusNotFound,
+				"message": err.Error(),
+			})
+			return
+		}
+	} else if order == "answers_count" {
 		if questions, err = q.GetOrderList("answers_count desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
@@ -231,8 +239,8 @@ func GetQuestions(c *gin.Context) {
 			})
 			return
 		}
-	} else if order == "update_time" {
-		if questions, err = q.GetOrderList("updated_at desc"); err != nil {
+	} else if order == "create_time" {
+		if questions, err = q.GetOrderList("created_at desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
 				"message": err.Error(),
@@ -274,5 +282,44 @@ func GetQuestions(c *gin.Context) {
 		"message": "success",
 		"data":    questionsVO,
 		"total":   count,
+	})
+}
+
+// GetTopQ 获取热榜
+func GetTopQ(c *gin.Context) {
+
+	topQ := make(map[int]interface{})
+	var questionVO QuestionVO
+	var p model.Profile
+
+	for i := 1; i <= 10; i++ {
+		obj, ok := service.GetTopQ().Load(strconv.Itoa(i))
+		if !ok {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "failed to find topQ...",
+			})
+			return
+		}
+
+		question := obj.(model.Question)
+		p.ID = question.UserID
+		profile, err := p.Get()
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusNotFound,
+				"message": err.Error(),
+			})
+			return
+		}
+		util.SimpleCopyProperties(&questionVO, &question)
+		util.SimpleCopyProperties(&questionVO.Questioner, &profile)
+		topQ[i] = questionVO
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "success",
+		"data":    topQ,
 	})
 }
