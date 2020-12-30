@@ -159,6 +159,7 @@ func Sign(c *gin.Context)  {
 func Login(c *gin.Context)  {
 
 	var l service.LoginInterface
+	var p model.Profile
 
 	if err := c.ShouldBindJSON(&l); err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -177,6 +178,15 @@ func Login(c *gin.Context)  {
 		return
 	}
 
+	p.UserID = user.ID
+	profile, err := p.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status": http.StatusNotFound,
+			"message": err.Error(),
+		})
+	}
+
 	token, err := middleware.Gen(user)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -185,9 +195,12 @@ func Login(c *gin.Context)  {
 		})
 	}
 
+
 	c.JSON(http.StatusOK, gin.H{
 		"status": http.StatusOK,
 		"message": "success",
 		"token": token,
+		"uid": user.ID,
+		"pid": profile.ID,
 	})
 }
