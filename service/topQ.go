@@ -22,9 +22,9 @@ func GetTopQ() *sync.Map {
 }
 
 // UpdateTopQ 更新热榜
-func UpdateTopQ(d time.Duration)  {
+func UpdateTopQ(d time.Duration, n int64)  {
 	for  {
-		result, err := database.RDB.ZRevRangeWithScores(ctx, ZSetKey, 0, 10).Result()
+		result, err := database.RDB.ZRevRangeWithScores(ctx, ZSetKey, 0, n).Result()
 		if err != nil {
 			log.Print("[ERROR]更新热门问题出现错误: "+err.Error())
 		}

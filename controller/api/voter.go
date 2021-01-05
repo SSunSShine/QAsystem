@@ -1,6 +1,8 @@
 package api
 
 import (
+	"context"
+	"github.com/SSunSShine/QAsystem/database"
 	"github.com/SSunSShine/QAsystem/model"
 	"github.com/SSunSShine/QAsystem/service"
 	"github.com/gin-gonic/gin"
@@ -15,6 +17,7 @@ var answerChan = make(chan uint, maxMessageNum)
 func CreateVoter(c *gin.Context)  {
 
 	var v model.Voter
+	var a model.Answer
 	var err error
 
 	UserID, exist := c.Get("uid")
@@ -59,6 +62,23 @@ func CreateVoter(c *gin.Context)  {
 	if v.UpOrDown {
 		// 通知异步更新 MySQL answer表
 		answerChan <- v.AnswerID
+
+		a.ID = v.AnswerID
+		answer, err := a.Get()
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status": http.StatusNotFound,
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// 增加热度记录到redis 点赞*2
+		_, err = database.RDB.ZIncrBy(context.Background(), service.ZSetKey, 2, strconv.Itoa(int(answer.QuestionID))).Result()
+		if err != nil {
+			log.Print(err)
+			return
+		}
 	}
 
 	if err = v.Create(); err != nil {

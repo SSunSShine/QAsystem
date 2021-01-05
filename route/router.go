@@ -58,6 +58,7 @@ func InitRouter(r *gin.Engine)  {
 		router.GET("questions/count", api.GetQuestionsCount)
 		router.GET("questions/list", api.GetQuestions)
 		router.GET("questions/topQ", api.GetTopQ)
+		router.GET("questions/qa", api.GetQA)
 
 		// Answer
 		router.GET("answers/count", api.GetAnswersCount)
@@ -70,5 +71,5 @@ func InitRouter(r *gin.Engine)  {
 	go service.UpdateAnswersCount()
 	go service.UpdateViews()
 	go api.UpdateSupporters()
-	go service.UpdateTopQ(time.Minute)
+	go service.UpdateTopQ(time.Minute*5, 50)
 }

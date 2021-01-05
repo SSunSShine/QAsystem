@@ -2,9 +2,11 @@ package service
 
 import (
 	"errors"
+	"github.com/SSunSShine/QAsystem/database"
 	"github.com/SSunSShine/QAsystem/model"
 	"github.com/SSunSShine/QAsystem/util"
 	"log"
+	"strconv"
 )
 
 // CreateAnswerInterface struct
@@ -39,6 +41,12 @@ func (ca *CreateAnswerInterface) Create(UserID, QuestionID uint) (a model.Answer
 		return
 	}
 
+	// 增加热度记录到redis 回答*3
+	_, err = database.RDB.ZIncrBy(ctx, ZSetKey, 3, strconv.Itoa(int(q.ID))).Result()
+	if err != nil {
+		log.Print(err)
+		return
+	}
 	answerCountChan <- QuestionID
 
 	return
