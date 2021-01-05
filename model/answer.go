@@ -76,6 +76,15 @@ func (a *Answer) Count() (count int, err error) {
 	return
 }
 
+// GetHotAnswer 得到点赞数最多的回答
+func (a *Answer) GetHotAnswer() (answer Answer, err error) {
+
+	if err = database.DB.Preload("User").Order("supporters_count desc").First(&answer, a).Error; err != nil {
+		log.Print(err)
+	}
+	return
+}
+
 // AfterDelete 问题下回答数量 - 1, 级联删除点赞，点踩记录
 func (a *Answer) AfterDelete(db *gorm.DB) (err error) {
 

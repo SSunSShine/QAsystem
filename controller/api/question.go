@@ -292,7 +292,7 @@ func GetTopQ(c *gin.Context) {
 	var questionVO QuestionVO
 	var p model.Profile
 
-	for i := 1; i <= 10; i++ {
+	for i := 1; i <= 50; i++ {
 		obj, ok := service.GetTopQ().Load(strconv.Itoa(i))
 		if !ok {
 			c.JSON(http.StatusOK, gin.H{

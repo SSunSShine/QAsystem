@@ -51,7 +51,7 @@ func (cq *CreateQuestionInterface) Create(UserID uint) (q model.Question, err er
 
 // IncrView 更新redis,浏览量Score +1
 func IncrView(qid string) (err error) {
-	// 增加浏览量记录到redis
+	// 增加热度记录到redis 浏览*1
 	_, err = database.RDB.ZIncrBy(ctx, ZSetKey, 1, qid).Result()
 	if err != nil {
 		log.Print(err)
