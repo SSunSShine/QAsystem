@@ -103,3 +103,24 @@ func (a *Answer) AfterDelete(db *gorm.DB) (err error) {
 	}
 	return
 }
+
+type QIDs struct {
+	QuestionId uint `json:"question_id"`
+}
+
+// GetRandomQuestionID 随机返回20个问题（无回答的不返回） ID
+func GetRandomQuestionID() (question_id []QIDs){
+
+	database.DB.Raw("select distinct question_id from answer ORDER BY RAND() limit 20").Find(&question_id)
+
+	return
+}
+
+func (a *Answer) GetRandomAnswer() (answer Answer, err error)  {
+
+	if err = database.DB.Where(&a).Order("RAND()").First(&answer).Error; err != nil {
+		log.Print(err)
+	}
+
+	return
+}
