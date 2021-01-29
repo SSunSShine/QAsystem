@@ -58,7 +58,7 @@ func InitRouter(r *gin.Engine)  {
 		router.GET("questions/count", api.GetQuestionsCount)
 		router.GET("questions/list", api.GetQuestions)
 		router.GET("questions/topQ", api.GetTopQ)
-		router.GET("questions/qa", api.GetQA)
+		router.GET("questions/qa", api.GetQa)
 
 		// Answer
 		router.GET("answers/count", api.GetAnswersCount)

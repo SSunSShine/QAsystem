@@ -4,11 +4,13 @@ import (
 	"github.com/SSunSShine/QAsystem/model"
 	"github.com/SSunSShine/QAsystem/util"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 )
 
+// QA 首页问答 （目前暂时带最热的回答）
 type QA struct {
 	ID           uint       `json:"id"`
 	Title        string     `json:"title"`
@@ -21,7 +23,8 @@ type QA struct {
 	UpdatedAt    time.Time  `json:"updatedAt"`
 }
 
-// GetQA 获取带最热回答的所有问题列表，注：不返回没有回答的问题
+// 暂时弃用
+// GetQA 获取带最热回答的所有问题列表，注：不返回没有回答的问题 （可做首页推荐）
 func GetQA(c *gin.Context) {
 
 	var q model.Question
@@ -124,3 +127,62 @@ func GetQA(c *gin.Context) {
 	})
 }
 
+// GetQa 获取带随机回答的随机问题列表，注：不返回没有回答的问题 （可做首页推荐）
+func GetQa(c *gin.Context) {
+
+	var q model.Question
+	var p model.Profile
+	var a model.Answer
+
+	// 随机获取 20 条有回答的问题id (不重复)
+	questionIds := model.GetRandomQuestionID()
+
+	count := 0
+	var qas []QA
+	for _, qid := range questionIds {
+		q.ID = qid.QuestionId
+		question, err := q.Get()
+		if err != nil {
+			log.Print("QA模块: questionId出错...")
+			return
+		}
+		p.UserID = question.UserID
+		questionProfile, err := p.Get()
+		if err != nil {
+			log.Print("QA模块: questionProfile出错...")
+			return
+		}
+
+		// 封装问题
+		var qa QA
+		util.SimpleCopyProperties(&qa, &question)
+		util.SimpleCopyProperties(&qa.Questioner, &questionProfile)
+
+		// 封装随机回答
+		a.QuestionID = qa.ID
+		answer, err := a.GetRandomAnswer()
+		if err != nil {
+			log.Print("QA模块: 随机回答出错...")
+			return
+		}
+
+		p.UserID = answer.UserID
+		answerProfile, err := p.Get()
+		if err != nil {
+			log.Print("QA模块: answerProfile出错...")
+			return
+		}
+		util.SimpleCopyProperties(&qa.HotAnswer, &answer)
+		util.SimpleCopyProperties(&qa.HotAnswer.Answerer, &answerProfile)
+
+		qas = append(qas, qa)
+		count++
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "success",
+		"data":    qas,
+		"total":   count,
+	})
+}
