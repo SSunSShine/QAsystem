@@ -106,7 +106,7 @@ func (q *Question) AfterDelete(db *gorm.DB) (err error) {
 	a.QuestionID = q.ID
 
 	if err = db.Where(&a).Unscoped().Delete(&a).Error; err != nil {
-		log.Print(err)
+		log.Print(err.Error()+": delete question and question's answer")
 	}
 	return
 }

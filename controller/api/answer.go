@@ -13,10 +13,12 @@ import (
 type AnswerVO struct {
 	ID              uint      `json:"id"`
 	Content         string    `json:"content"`
+	QuestionID      uint      `json:"questionId"`
 	QuestionTitle   string    `json:"questionTitle"`
 	Answerer        Answerer  `json:"answerer"`
 	SupportersCount int       `json:"supportersCount"` // 只统计点赞数
 	Voted           int       `json:"voted" gorm:"-"`  // 1 赞， 0 未投票， -1 踩
+	CommentsCount   int       `json:"commentsCount"`
 	CreatedAt       time.Time `json:"createdAt"`
 	UpdatedAt       time.Time `json:"updatedAt"`
 }
@@ -39,7 +41,7 @@ func GetAnswer(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": answer",
 		})
 		return
 	}
@@ -58,8 +60,8 @@ func GetAnswer(c *gin.Context) {
 	if UID, exist := c.Get("uid"); exist {
 		if err = service.WrapVoted(&answer, UID.(uint)); err != nil {
 			c.JSON(http.StatusOK, gin.H{
-				"status": http.StatusInternalServerError,
-				"message": err.Error(),
+				"status":  http.StatusInternalServerError,
+				"message": err.Error()+": check voted",
 			})
 			return
 		}
@@ -87,7 +89,7 @@ func UpdateAnswer(c *gin.Context) {
 	if err := c.ShouldBindJSON(&a); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": bind answer json",
 		})
 		return
 	}
@@ -95,7 +97,7 @@ func UpdateAnswer(c *gin.Context) {
 	if err := a.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": update answer",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -115,7 +117,7 @@ func DeleteAnswer(c *gin.Context) {
 	if err := a.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": delete answer",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -136,7 +138,7 @@ func GetAnswersCount(c *gin.Context) {
 	if count, err := a.Count(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": get answers count",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -159,7 +161,7 @@ func CreateAnswer(c *gin.Context) {
 	if !exist {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": "Not exist",
+			"message": "Not exist: userid",
 		})
 		c.Abort()
 		return
@@ -168,7 +170,7 @@ func CreateAnswer(c *gin.Context) {
 	if !ok {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": "Not uint",
+			"message": "Not uint: userid",
 		})
 		c.Abort()
 		return
@@ -177,7 +179,7 @@ func CreateAnswer(c *gin.Context) {
 	if err := c.ShouldBindJSON(&ca); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": bind answer",
 		})
 		return
 	}
@@ -186,7 +188,7 @@ func CreateAnswer(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": userid or questionId",
 		})
 		return
 	}
@@ -196,7 +198,7 @@ func CreateAnswer(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": profile",
 		})
 		return
 	}
@@ -230,7 +232,7 @@ func GetAnswersByUser(c *gin.Context) {
 		if answers, err = a.GetOrderList("supporters_count desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": answers",
 			})
 			return
 		}
@@ -238,7 +240,7 @@ func GetAnswersByUser(c *gin.Context) {
 		if answers, err = a.GetOrderList("created_at desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": answers",
 			})
 			return
 		}
@@ -246,7 +248,7 @@ func GetAnswersByUser(c *gin.Context) {
 		if answers, err = a.GetList(); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": answers",
 			})
 			return
 		}
@@ -257,7 +259,7 @@ func GetAnswersByUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": profile",
 		})
 		return
 	}
@@ -298,7 +300,7 @@ func GetAnswersByQuestion(c *gin.Context) {
 		if answers, err = a.GetOrderList("supporters_count desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": answers",
 			})
 			return
 		}
@@ -306,7 +308,7 @@ func GetAnswersByQuestion(c *gin.Context) {
 		if answers, err = a.GetOrderList("created_at desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": answers",
 			})
 			return
 		}
@@ -314,7 +316,7 @@ func GetAnswersByQuestion(c *gin.Context) {
 		if answers, err = a.GetList(); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": answers",
 			})
 			return
 		}
@@ -328,7 +330,7 @@ func GetAnswersByQuestion(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": profile",
 			})
 			return
 		}
@@ -350,7 +352,7 @@ func GetAnswersByQuestion(c *gin.Context) {
 	})
 }
 
-// GetAnswersByVoter 按点赞获取回答列表
+// GetAnswersByVoter 按点赞者获取回答列表
 func GetAnswersByVoter(c *gin.Context) {
 
 	var p model.Profile
@@ -364,7 +366,7 @@ func GetAnswersByVoter(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": voters",
 		})
 		return
 	}
@@ -377,7 +379,7 @@ func GetAnswersByVoter(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": profile",
 			})
 			return
 		}

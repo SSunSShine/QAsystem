@@ -24,7 +24,7 @@ func CreateVoter(c *gin.Context)  {
 	if !exist {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": "Not exist",
+			"message": "Not exist: userid",
 		})
 		c.Abort()
 		return
@@ -33,7 +33,7 @@ func CreateVoter(c *gin.Context)  {
 	if !ok {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": "Not uint",
+			"message": "Not uint: userid",
 		})
 		c.Abort()
 		return
@@ -54,7 +54,7 @@ func CreateVoter(c *gin.Context)  {
 	if err = service.AddVoter(v.AnswerID, v.UserID, v.UpOrDown); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": add Voter",
 		})
 		return
 	}
@@ -68,7 +68,7 @@ func CreateVoter(c *gin.Context)  {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status": http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": answer",
 			})
 			return
 		}
@@ -84,7 +84,7 @@ func CreateVoter(c *gin.Context)  {
 	if err = v.Create(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": create voter",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -104,7 +104,7 @@ func DeleteVoter(c *gin.Context)  {
 	if !exist {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": "Not exist",
+			"message": "Not exist: userid",
 		})
 		c.Abort()
 		return
@@ -113,7 +113,7 @@ func DeleteVoter(c *gin.Context)  {
 	if !ok {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": "Not uint",
+			"message": "Not uint: userid",
 		})
 		c.Abort()
 		return
@@ -134,7 +134,7 @@ func DeleteVoter(c *gin.Context)  {
 	if err = service.RemoveVoter(v.AnswerID, v.UserID, v.UpOrDown); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": remove voter",
 		})
 		return
 	}
@@ -142,7 +142,7 @@ func DeleteVoter(c *gin.Context)  {
 	if err = v.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": delete voter",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
