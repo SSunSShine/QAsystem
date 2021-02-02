@@ -39,6 +39,11 @@ func InitRouter(r *gin.Engine)  {
 		// Voter
 		auth.POST("voter/:answerID", api.CreateVoter)
 		auth.DELETE("voter/:answerID", api.DeleteVoter)
+
+		// Comment
+		auth.POST("comment/create", api.CreateComment)
+		auth.PUT("comment/:id", api.UpdateComment)
+		auth.DELETE("comment/:id", api.DeleteComment)
 	}
 	router := r.Group("/api")
 	{
@@ -65,10 +70,17 @@ func InitRouter(r *gin.Engine)  {
 		router.GET("answers/listByQuestion", api.GetAnswersByQuestion)
 		router.GET("answers/listByUser", api.GetAnswersByUser)
 		router.GET("answers/listByVoter", api.GetAnswersByVoter)
+
+		// Comment
+		router.GET("comment/:id", api.GetComment)
+		router.GET("comments/count", api.GetCommentsCount)
+		router.GET("comments/listByUser", api.GetCommentsByUser)
+		router.GET("comments/listByAnswer", api.GetCommentsByAnswer)
 	}
 
 	// 启动goroutine异步更新数据库
 	go service.UpdateAnswersCount()
+	go service.UpdateCommentsCount()
 	go service.UpdateViews()
 	go api.UpdateSupporters()
 	go service.UpdateTopQ(time.Minute*5, 50)

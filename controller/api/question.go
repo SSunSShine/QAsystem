@@ -41,7 +41,7 @@ func GetQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": question",
 		})
 		return
 	}
@@ -51,7 +51,7 @@ func GetQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": profile",
 		})
 		return
 	}
@@ -61,7 +61,7 @@ func GetQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": questionId",
 		})
 		return
 	}
@@ -87,7 +87,7 @@ func UpdateQuestion(c *gin.Context) {
 	if err := c.ShouldBindJSON(&q); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": bind question json",
 		})
 		return
 	}
@@ -95,7 +95,7 @@ func UpdateQuestion(c *gin.Context) {
 	if err := q.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": update question",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -116,7 +116,7 @@ func DeleteQuestion(c *gin.Context) {
 	if err := q.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": delete question",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -137,7 +137,7 @@ func GetQuestionsCount(c *gin.Context) {
 	if count, err := q.Count(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": questions count",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -157,7 +157,7 @@ func CreateQuestion(c *gin.Context) {
 	if !exist {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": "Not exist",
+			"message": "Not exist: userid",
 		})
 		c.Abort()
 		return
@@ -166,7 +166,7 @@ func CreateQuestion(c *gin.Context) {
 	if !ok {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": "Not uint",
+			"message": "Not uint: userid",
 		})
 		c.Abort()
 		return
@@ -175,7 +175,7 @@ func CreateQuestion(c *gin.Context) {
 	if err := c.ShouldBindJSON(&cq); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": bind question json",
 		})
 		return
 	}
@@ -184,7 +184,7 @@ func CreateQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": create question",
 		})
 		return
 	}
@@ -194,7 +194,7 @@ func CreateQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": profile",
 		})
 		return
 	}
@@ -227,7 +227,7 @@ func GetQuestions(c *gin.Context) {
 		if questions, err = q.GetOrderList("view_count desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": questions",
 			})
 			return
 		}
@@ -235,7 +235,7 @@ func GetQuestions(c *gin.Context) {
 		if questions, err = q.GetOrderList("answers_count desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": questions",
 			})
 			return
 		}
@@ -243,7 +243,7 @@ func GetQuestions(c *gin.Context) {
 		if questions, err = q.GetOrderList("created_at desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": questions",
 			})
 			return
 		}
@@ -251,7 +251,7 @@ func GetQuestions(c *gin.Context) {
 		if questions, err = q.GetList(); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": questions",
 			})
 			return
 		}
@@ -265,7 +265,7 @@ func GetQuestions(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": profile",
 			})
 			return
 		}
@@ -308,7 +308,7 @@ func GetTopQ(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error(),
+				"message": err.Error()+": profile",
 			})
 			return
 		}

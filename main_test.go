@@ -234,7 +234,6 @@ func TestAnswer(t *testing.T)  {
 		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
 
 	// 删除回答
-	// 注销
 	e.DELETE("/api/answer/2").
 		WithHeader("Authorization", token).
 		Expect().
@@ -256,6 +255,65 @@ func TestVoter(t *testing.T)  {
 
 	// 取消点赞
 	e.DELETE("/api/voter/1").WithQuery("upOrDown", "true").
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+}
+
+func TestComment(t *testing.T) {
+	e := httpexpect.New(t, server.URL)
+
+	// 获取评论信息
+	e.GET("/api/comment/1").
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 评论回答
+	e.POST("/api/comment/create").WithQuery("answerID", 1).
+		WithJSON(map[string]interface{}{
+			"content": "Test Comment",
+		}).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 修改评论
+	e.PUT("/api/comment/2").
+		WithJSON(map[string]interface{}{
+			"content": "Test Comment11111",
+		}).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 获取某用户评论数量
+	e.GET("/api/comments/count").WithQuery("userID", 1).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 获取某用户评论列表
+	e.GET("/api/comments/listByUser").WithQuery("userID", 1).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 获取某回答评论列表
+	e.GET("/api/comments/listByAnswer").WithQuery("answerID", 1).
+		WithHeader("Authorization", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+
+	// 删除回答
+	e.DELETE("/api/comment/2").
 		WithHeader("Authorization", token).
 		Expect().
 		Status(http.StatusOK).

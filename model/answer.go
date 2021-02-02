@@ -15,8 +15,9 @@ type Answer struct {
 	UserID          uint     `json:"userId"`
 	User            User     `json:"user"  gorm:"ForeignKey:UserID"`
 	Voters          []Voter  `json:"-"`
-	SupportersCount int      `json:"supportersCount"`	 // 只统计点赞数
-	Voted           int      `json:"voted" gorm:"-"`     // 1 赞， 0 未投票， -1 踩
+	SupportersCount int      `json:"supportersCount"` // 只统计点赞数
+	Voted           int      `json:"voted" gorm:"-"`  // 1 赞， 0 未投票， -1 踩
+	CommentsCount   int      `json:"commentsCount"`
 }
 
 func (a *Answer) Get() (answer Answer, err error) {
@@ -85,7 +86,7 @@ func (a *Answer) GetHotAnswer() (answer Answer, err error) {
 	return
 }
 
-// AfterDelete 问题下回答数量 - 1, 级联删除点赞，点踩记录
+// AfterDelete 问题下回答数量 - 1
 func (a *Answer) AfterDelete(db *gorm.DB) (err error) {
 
 	var q Question
@@ -95,12 +96,6 @@ func (a *Answer) AfterDelete(db *gorm.DB) (err error) {
 		log.Print(err)
 	}
 
-	var v Voter
-	v.AnswerID = a.ID
-
-	if err = db.Where(&v).Unscoped().Delete(&v).Error; err != nil {
-		log.Print(err)
-	}
 	return
 }
 
@@ -109,18 +104,26 @@ type QIDs struct {
 }
 
 // GetRandomQuestionID 随机返回20个问题（无回答的不返回） ID
-func GetRandomQuestionID() (question_id []QIDs){
+func GetRandomQuestionID() (question_id []QIDs) {
 
 	database.DB.Raw("select distinct question_id from answer ORDER BY RAND() limit 20").Find(&question_id)
 
 	return
 }
 
-func (a *Answer) GetRandomAnswer() (answer Answer, err error)  {
+func (a *Answer) GetRandomAnswer() (answer Answer, err error) {
 
 	if err = database.DB.Where(&a).Order("RAND()").First(&answer).Error; err != nil {
 		log.Print(err)
 	}
 
+	return
+}
+
+// IncrCommentsCount 评论数 +1
+func (a *Answer) IncrCommentsCount() (err error) {
+	if err := database.DB.Model(&a).UpdateColumn("comments_count", gorm.Expr("comments_count + ?", 1)).Error; err != nil {
+		log.Print(err)
+	}
 	return
 }

@@ -29,7 +29,7 @@ func GetUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": user",
 		})
 
 		return
@@ -39,7 +39,7 @@ func GetUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": copy userVO",
 		})
 		return
 	}
@@ -63,7 +63,7 @@ func UpdateUser(c *gin.Context)  {
 	if err := c.ShouldBindJSON(&u); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": bind user json",
 		})
 	}
 
@@ -71,7 +71,7 @@ func UpdateUser(c *gin.Context)  {
 	if err := u.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": update user",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -93,7 +93,7 @@ func DeleteUser(c *gin.Context)  {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": user",
 		})
 		return
 	}
@@ -101,7 +101,7 @@ func DeleteUser(c *gin.Context)  {
 	if err := user.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": delete user",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -119,7 +119,7 @@ func GetUsersCount(c *gin.Context)  {
 	if count, err := u.Count(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": users count",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -138,14 +138,14 @@ func Sign(c *gin.Context)  {
 	if err := c.ShouldBindJSON(&s); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": bind user json",
 		})
 	}
 
 	if err := s.Sign(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": sign",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -164,7 +164,7 @@ func Login(c *gin.Context)  {
 	if err := c.ShouldBindJSON(&l); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": bind user json",
 		})
 		return
 	}
@@ -173,7 +173,7 @@ func Login(c *gin.Context)  {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": login",
 		})
 		return
 	}
@@ -183,7 +183,7 @@ func Login(c *gin.Context)  {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusNotFound,
-			"message": err.Error(),
+			"message": err.Error()+": profile",
 		})
 	}
 
@@ -191,7 +191,7 @@ func Login(c *gin.Context)  {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": err.Error()+": generate token",
 		})
 	}
 

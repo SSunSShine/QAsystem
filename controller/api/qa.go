@@ -17,8 +17,8 @@ type QA struct {
 	Desc         string     `json:"desc"`
 	Questioner   Questioner `json:"questioner"`
 	AnswersCount int        `json:"answersCount"`
-	ViewCount	 int		`json:"viewCount"`
-	HotAnswer	 AnswerVO	`json:"hotAnswer"`
+	ViewCount    int        `json:"viewCount"`
+	Answer       AnswerVO   `json:"answer"`
 	CreatedAt    time.Time  `json:"createdAt"`
 	UpdatedAt    time.Time  `json:"updatedAt"`
 }
@@ -112,8 +112,8 @@ func GetQA(c *gin.Context) {
 			})
 			return
 		}
-		util.SimpleCopyProperties(&qa.HotAnswer, &answer)
-		util.SimpleCopyProperties(&qa.HotAnswer.Answerer, &answerProfile)
+		util.SimpleCopyProperties(&qa.Answer, &answer)
+		util.SimpleCopyProperties(&qa.Answer.Answerer, &answerProfile)
 
 		qas = append(qas, qa)
 		count++
@@ -172,8 +172,8 @@ func GetQa(c *gin.Context) {
 			log.Print("QA模块: answerProfile出错...")
 			return
 		}
-		util.SimpleCopyProperties(&qa.HotAnswer, &answer)
-		util.SimpleCopyProperties(&qa.HotAnswer.Answerer, &answerProfile)
+		util.SimpleCopyProperties(&qa.Answer, &answer)
+		util.SimpleCopyProperties(&qa.Answer.Answerer, &answerProfile)
 
 		qas = append(qas, qa)
 		count++
