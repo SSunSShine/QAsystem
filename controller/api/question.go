@@ -1,10 +1,13 @@
 package api
 
 import (
+	"context"
+	"github.com/SSunSShine/QAsystem/database"
 	"github.com/SSunSShine/QAsystem/model"
 	"github.com/SSunSShine/QAsystem/service"
 	"github.com/SSunSShine/QAsystem/util"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,6 +20,7 @@ type QuestionVO struct {
 	Questioner   Questioner `json:"questioner"`
 	AnswersCount int        `json:"answersCount"`
 	ViewCount	 int		`json:"viewCount"`
+	Hot			 float64	`json:"hot"`
 	CreatedAt    time.Time  `json:"createdAt"`
 	UpdatedAt    time.Time  `json:"updatedAt"`
 }
@@ -119,6 +123,9 @@ func DeleteQuestion(c *gin.Context) {
 			"message": err.Error()+": delete question",
 		})
 	} else {
+		if err := database.RDB.ZRem(context.Background(), "question", q.ID).Err(); err != nil {
+			log.Print(err)
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusOK,
 			"message": "success",
@@ -295,22 +302,16 @@ func GetTopQ(c *gin.Context) {
 	for i := 1; i <= 50; i++ {
 		obj, ok := service.GetTopQ().Load(strconv.Itoa(i))
 		if !ok {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  http.StatusNotFound,
-				"message": "failed to find topQ...",
-			})
-			return
+			log.Print("问题不足热榜数目!")
+			break
 		}
 
 		question := obj.(model.Question)
 		p.ID = question.UserID
 		profile, err := p.Get()
 		if err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  http.StatusNotFound,
-				"message": err.Error()+": profile",
-			})
-			return
+			log.Print(err.Error()+": profile")
+			break
 		}
 		util.SimpleCopyProperties(&questionVO, &question)
 		util.SimpleCopyProperties(&questionVO.Questioner, &profile)

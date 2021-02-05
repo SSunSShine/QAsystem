@@ -2,9 +2,11 @@ package service
 
 import (
 	"errors"
+	"github.com/SSunSShine/QAsystem/database"
 	"github.com/SSunSShine/QAsystem/model"
 	"github.com/SSunSShine/QAsystem/util"
 	"log"
+	"strconv"
 )
 
 // CreateCommentInterface struct
@@ -39,6 +41,12 @@ func (cc *CreateCommentInterface) Create(UserID, AnswerID uint) (co model.Commen
 		return
 	}
 
+	// 增加热度记录到redis 评论*0.2*1000
+	_, err = database.RDB.ZIncrBy(ctx, ZSetKey, 200, strconv.Itoa(int(co.Answer.QuestionID))).Result()
+	if err != nil {
+		log.Print(err)
+		return
+	}
 	commentsCountChan <- AnswerID
 
 	return

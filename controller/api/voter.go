@@ -73,8 +73,8 @@ func CreateVoter(c *gin.Context)  {
 			return
 		}
 
-		// 增加热度记录到redis 点赞*2
-		_, err = database.RDB.ZIncrBy(context.Background(), service.ZSetKey, 2, strconv.Itoa(int(answer.QuestionID))).Result()
+		// 增加热度记录到redis 点赞*0.2*1000
+		_, err = database.RDB.ZIncrBy(context.Background(), service.ZSetKey, 200, strconv.Itoa(int(answer.QuestionID))).Result()
 		if err != nil {
 			log.Print(err)
 			return

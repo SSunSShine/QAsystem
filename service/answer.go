@@ -41,8 +41,8 @@ func (ca *CreateAnswerInterface) Create(UserID, QuestionID uint) (a model.Answer
 		return
 	}
 
-	// 增加热度记录到redis 回答*3
-	_, err = database.RDB.ZIncrBy(ctx, ZSetKey, 3, strconv.Itoa(int(q.ID))).Result()
+	// 增加热度记录到redis 回答*0.5*1000
+	_, err = database.RDB.ZIncrBy(ctx, ZSetKey, 500, strconv.Itoa(int(q.ID))).Result()
 	if err != nil {
 		log.Print(err)
 		return

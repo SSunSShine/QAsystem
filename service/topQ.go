@@ -26,19 +26,20 @@ func UpdateTopQ(d time.Duration, n int64)  {
 	for  {
 		result, err := database.RDB.ZRevRangeWithScores(ctx, ZSetKey, 0, n).Result()
 		if err != nil {
-			log.Print("[ERROR]更新热门问题出现错误: "+err.Error())
+			log.Print("[ERROR]更新热门问题出现错误: "+err.Error()+": zset")
 		}
 		var q model.Question
 		for i, z := range result {
 			id, err := strconv.Atoi(z.Member.(string))
 			if err != nil {
-				log.Print("[ERROR]更新热门问题出现错误: "+err.Error())
+				log.Print("[ERROR]更新热门问题出现错误: "+err.Error()+": id")
 			}
 			q.ID = uint(id)
 			question, err := q.Get()
 			if err != nil {
-				log.Print("[ERROR]更新热门问题出现错误: "+err.Error())
+				log.Print("[ERROR]更新热门问题出现错误: "+err.Error()+": get question")
 			}
+			question.Hot = z.Score
 			GetTopQ().Store(strconv.Itoa(i+1), question)
 		}
 		log.Print("热门问题更新成功! ")
