@@ -9,12 +9,13 @@ import (
 // Question 问题
 type Question struct {
 	gorm.Model
-	Title        string   `json:"title" gorm:"type:varchar(50);not null"`
-	Desc         string   `json:"desc" gorm:"type:varchar(4000);not null"`
-	UserID       uint     `json:"userId"`
-	User         User     `json:"user"  gorm:"ForeignKey:UserID"`
-	AnswersCount int      `json:"answersCount"`
-	ViewCount	 int	  `json:"viewCount"`
+	Title        string  `json:"title" gorm:"type:varchar(50);not null"`
+	Desc         string  `json:"desc" gorm:"type:varchar(4000);not null"`
+	UserID       uint    `json:"userId"`
+	User         User    `json:"user"  gorm:"ForeignKey:UserID"`
+	AnswersCount int     `json:"answersCount"`
+	ViewCount    int     `json:"viewCount"`
+	Hot          float64 `json:"hot" sql:"-"`
 }
 
 func (q *Question) Get() (question Question, err error) {
@@ -106,7 +107,7 @@ func (q *Question) AfterDelete(db *gorm.DB) (err error) {
 	a.QuestionID = q.ID
 
 	if err = db.Where(&a).Unscoped().Delete(&a).Error; err != nil {
-		log.Print(err.Error()+": delete question and question's answer")
+		log.Print(err.Error() + ": delete question and question's answer")
 	}
 	return
 }
