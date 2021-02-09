@@ -56,6 +56,21 @@ func WrapVoted(answer *model.Answer, UserID uint) (err error) {
 	return
 }
 
+// WrapListSupported 标记回答列表是否被点赞或点踩
+func WrapListSupported(answers []model.Answer, UserID uint) (err error) {
+
+	memMap, err := getMemMap(UserID)
+	if err != nil {
+		return
+	}
+
+	for key, answer := range answers {
+		upID := strconv.Itoa(int(answer.ID))
+		answers[key].Voted = memMap[upID]
+	}
+	return
+}
+
 func getRedisKey(UserID uint, UpOrDown bool) (redisKey string) {
 	if UpOrDown {
 		redisKey = fmt.Sprintf("upvoted:%v", UserID)

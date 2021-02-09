@@ -31,7 +31,6 @@ func GetUser(c *gin.Context) {
 			"status":  http.StatusNotFound,
 			"message": err.Error()+": user",
 		})
-
 		return
 	}
 	var userVO UserVO
@@ -60,13 +59,39 @@ func UpdateUser(c *gin.Context)  {
 	id, _ := strconv.Atoi(c.Param("id"))
 	u.ID = uint(id)
 
+	user, err := u.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status": http.StatusNotFound,
+			"message": err.Error()+": userid",
+		})
+		return
+	}
+	uid, _ := c.Get("uid")
+	UID := uid.(uint)
+	if UID != user.ID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "无权修改他人的信息",
+		})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&u); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
 			"message": err.Error()+": bind user json",
 		})
+		return
 	}
-
+	// 防止json中的id 与 url的id不同
+	if user.ID != u.ID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "JSON中的id与url中的id不同",
+		})
+		return
+	}
 
 	if err := u.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -92,8 +117,17 @@ func DeleteUser(c *gin.Context)  {
 	user, err := u.Get()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status":  http.StatusNotFound,
+			"status": http.StatusNotFound,
 			"message": err.Error()+": user",
+		})
+		return
+	}
+	uid, _ := c.Get("uid")
+	UID := uid.(uint)
+	if UID != user.ID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "无权修改他人的信息",
 		})
 		return
 	}
@@ -140,6 +174,7 @@ func Sign(c *gin.Context)  {
 			"status": http.StatusInternalServerError,
 			"message": err.Error()+": bind user json",
 		})
+		return
 	}
 
 	if err := s.Sign(); err != nil {
@@ -185,6 +220,7 @@ func Login(c *gin.Context)  {
 			"status": http.StatusNotFound,
 			"message": err.Error()+": profile",
 		})
+		return
 	}
 
 	token, err := middleware.Gen(user)
@@ -193,6 +229,7 @@ func Login(c *gin.Context)  {
 			"status": http.StatusInternalServerError,
 			"message": err.Error()+": generate token",
 		})
+		return
 	}
 
 

@@ -19,16 +19,17 @@ type QuestionVO struct {
 	Desc         string     `json:"desc"`
 	Questioner   Questioner `json:"questioner"`
 	AnswersCount int        `json:"answersCount"`
-	ViewCount	 int		`json:"viewCount"`
-	Hot			 float64	`json:"hot"`
+	ViewCount    int        `json:"viewCount"`
+	Hot          float64    `json:"hot"`
 	CreatedAt    time.Time  `json:"createdAt"`
 	UpdatedAt    time.Time  `json:"updatedAt"`
 }
 
 type Questioner struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-	Desc string `json:"desc"`
+	ID     uint   `json:"id"` // profileId
+	UserID uint   `json:"userId"`
+	Name   string `json:"name"`
+	Desc   string `json:"desc"`
 }
 
 // GetQuestion 获取单个问题信息
@@ -45,7 +46,7 @@ func GetQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": question",
+			"message": err.Error() + ": question",
 		})
 		return
 	}
@@ -55,7 +56,7 @@ func GetQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": profile",
+			"message": err.Error() + ": profile",
 		})
 		return
 	}
@@ -65,7 +66,7 @@ func GetQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": questionId",
+			"message": err.Error() + ": questionId",
 		})
 		return
 	}
@@ -88,10 +89,36 @@ func UpdateQuestion(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	q.ID = uint(id)
 
+	question, err := q.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error() + ": question",
+		})
+		return
+	}
+	uid, _ := c.Get("uid")
+	UID := uid.(uint)
+	if UID != question.UserID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "无权修改他人的信息",
+		})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&q); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": err.Error()+": bind question json",
+			"message": err.Error() + ": bind question json",
+		})
+		return
+	}
+	// 防止json中的id 与 url的id不同
+	if question.ID != q.ID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "JSON中的id与url中的id不同",
 		})
 		return
 	}
@@ -99,7 +126,7 @@ func UpdateQuestion(c *gin.Context) {
 	if err := q.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": update question",
+			"message": err.Error() + ": update question",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -116,11 +143,28 @@ func DeleteQuestion(c *gin.Context) {
 
 	id, _ := strconv.Atoi(c.Param("id"))
 	q.ID = uint(id)
+	question, err := q.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error() + ": question",
+		})
+		return
+	}
+	uid, _ := c.Get("uid")
+	UID := uid.(uint)
+	if UID != question.UserID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "无权修改他人的信息",
+		})
+		return
+	}
 
 	if err := q.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": delete question",
+			"message": err.Error() + ": delete question",
 		})
 	} else {
 		if err := database.RDB.ZRem(context.Background(), "question", q.ID).Err(); err != nil {
@@ -144,7 +188,7 @@ func GetQuestionsCount(c *gin.Context) {
 	if count, err := q.Count(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": questions count",
+			"message": err.Error() + ": questions count",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -182,7 +226,7 @@ func CreateQuestion(c *gin.Context) {
 	if err := c.ShouldBindJSON(&cq); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": err.Error()+": bind question json",
+			"message": err.Error() + ": bind question json",
 		})
 		return
 	}
@@ -191,7 +235,7 @@ func CreateQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": create question",
+			"message": err.Error() + ": create question",
 		})
 		return
 	}
@@ -201,7 +245,7 @@ func CreateQuestion(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": profile",
+			"message": err.Error() + ": profile",
 		})
 		return
 	}
@@ -234,7 +278,7 @@ func GetQuestions(c *gin.Context) {
 		if questions, err = q.GetOrderList("view_count desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": questions",
+				"message": err.Error() + ": questions",
 			})
 			return
 		}
@@ -242,7 +286,7 @@ func GetQuestions(c *gin.Context) {
 		if questions, err = q.GetOrderList("answers_count desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": questions",
+				"message": err.Error() + ": questions",
 			})
 			return
 		}
@@ -250,7 +294,7 @@ func GetQuestions(c *gin.Context) {
 		if questions, err = q.GetOrderList("created_at desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": questions",
+				"message": err.Error() + ": questions",
 			})
 			return
 		}
@@ -258,7 +302,7 @@ func GetQuestions(c *gin.Context) {
 		if questions, err = q.GetList(); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": questions",
+				"message": err.Error() + ": questions",
 			})
 			return
 		}
@@ -272,7 +316,7 @@ func GetQuestions(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": profile",
+				"message": err.Error() + ": profile",
 			})
 			return
 		}
@@ -295,9 +339,9 @@ func GetQuestions(c *gin.Context) {
 // GetTopQ 获取热榜
 func GetTopQ(c *gin.Context) {
 
-	topQ := make(map[int]interface{})
 	var questionVO QuestionVO
 	var p model.Profile
+	var questionsVO []QuestionVO
 
 	for i := 1; i <= 50; i++ {
 		obj, ok := service.GetTopQ().Load(strconv.Itoa(i))
@@ -310,17 +354,17 @@ func GetTopQ(c *gin.Context) {
 		p.ID = question.UserID
 		profile, err := p.Get()
 		if err != nil {
-			log.Print(err.Error()+": profile")
+			log.Print(err.Error() + ": profile")
 			break
 		}
 		util.SimpleCopyProperties(&questionVO, &question)
 		util.SimpleCopyProperties(&questionVO.Questioner, &profile)
-		topQ[i] = questionVO
+		questionsVO = append(questionsVO, questionVO)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "success",
-		"data":    topQ,
+		"data":    questionsVO,
 	})
 }

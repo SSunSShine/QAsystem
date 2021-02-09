@@ -53,10 +53,36 @@ func UpdateProfile(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	p.ID = uint(id)
 
+	profile, err := p.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error()+": profile",
+		})
+		return
+	}
+	uid, _ := c.Get("uid")
+	UID := uid.(uint)
+	if UID != profile.UserID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "无权修改他人的信息",
+		})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&p); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": err.Error()+": bind profile json",
+		})
+		return
+	}
+	// 防止json中的id 与 url的id不同
+	if profile.ID != p.ID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "JSON中的id与url中的id不同",
 		})
 		return
 	}
@@ -104,6 +130,15 @@ func DeleteProfile(c *gin.Context)  {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
 			"message": err.Error()+": profile",
+		})
+		return
+	}
+	uid, _ := c.Get("uid")
+	UID := uid.(uint)
+	if UID != profile.UserID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "无权修改他人的信息",
 		})
 		return
 	}

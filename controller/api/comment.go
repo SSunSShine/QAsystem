@@ -20,8 +20,10 @@ type CommentVO struct {
 }
 
 type Commenter struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
+	ID     uint   `json:"id"`
+	UserID uint   `json:"userId"`
+	Name   string `json:"name"`
+	Desc   string `json:"desc"`
 }
 
 func GetComment(c *gin.Context) {
@@ -36,7 +38,7 @@ func GetComment(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": comment",
+			"message": err.Error() + ": comment",
 		})
 		return
 	}
@@ -46,7 +48,7 @@ func GetComment(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": profile",
+			"message": err.Error() + ": profile",
 		})
 		return
 	}
@@ -69,10 +71,36 @@ func UpdateComment(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	co.ID = uint(id)
 
+	comment, err := co.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error()+": comment",
+		})
+		return
+	}
+	uid, _ := c.Get("uid")
+	UID := uid.(uint)
+	if UID != comment.UserID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "无权修改他人的信息",
+		})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&co); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": err.Error()+": bind comment json",
+			"message": err.Error() + ": bind comment json",
+		})
+		return
+	}
+	// 防止json中的id 与 url的id不同
+	if comment.ID != co.ID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "JSON中的id与url中的id不同",
 		})
 		return
 	}
@@ -80,7 +108,7 @@ func UpdateComment(c *gin.Context) {
 	if err := co.Update(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": update comment",
+			"message": err.Error() + ": update comment",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -97,10 +125,28 @@ func DeleteComment(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	co.ID = uint(id)
 
+	comment, err := co.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error()+": comment",
+		})
+		return
+	}
+	uid, _ := c.Get("uid")
+	UID := uid.(uint)
+	if UID != comment.UserID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "无权修改他人的信息",
+		})
+		return
+	}
+
 	if err := co.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": delete comment",
+			"message": err.Error() + ": delete comment",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -121,7 +167,7 @@ func GetCommentsCount(c *gin.Context) {
 	if count, err := co.Count(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": comment count",
+			"message": err.Error() + ": comment count",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -162,7 +208,7 @@ func CreateComment(c *gin.Context) {
 	if err := c.ShouldBindJSON(&cc); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": err.Error()+": bind comment json",
+			"message": err.Error() + ": bind comment json",
 		})
 		return
 	}
@@ -171,7 +217,7 @@ func CreateComment(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": userid or answerId",
+			"message": err.Error() + ": userid or answerId",
 		})
 		return
 	}
@@ -181,7 +227,7 @@ func CreateComment(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": profile",
+			"message": err.Error() + ": profile",
 		})
 		return
 	}
@@ -213,7 +259,7 @@ func GetCommentsByUser(c *gin.Context) {
 		if comments, err = co.GetOrderList("created_at desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": comments",
+				"message": err.Error() + ": comments",
 			})
 			return
 		}
@@ -221,7 +267,7 @@ func GetCommentsByUser(c *gin.Context) {
 		if comments, err = co.GetList(); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": comments",
+				"message": err.Error() + ": comments",
 			})
 			return
 		}
@@ -232,7 +278,7 @@ func GetCommentsByUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusNotFound,
-			"message": err.Error()+": profile",
+			"message": err.Error() + ": profile",
 		})
 		return
 	}
@@ -272,7 +318,7 @@ func GetCommentsByAnswer(c *gin.Context) {
 		if comments, err = co.GetOrderList("created_at desc"); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": comments",
+				"message": err.Error() + ": comments",
 			})
 			return
 		}
@@ -280,7 +326,7 @@ func GetCommentsByAnswer(c *gin.Context) {
 		if comments, err = co.GetList(); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": comments",
+				"message": err.Error() + ": comments",
 			})
 			return
 		}
@@ -294,7 +340,7 @@ func GetCommentsByAnswer(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  http.StatusNotFound,
-				"message": err.Error()+": profile",
+				"message": err.Error() + ": profile",
 			})
 			return
 		}
