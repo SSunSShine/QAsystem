@@ -341,7 +341,7 @@ func GetTopQ(c *gin.Context) {
 
 	var questionVO QuestionVO
 	var p model.Profile
-	topQ := make(map[int]interface{})
+	var questionsVO []QuestionVO
 
 	for i := 1; i <= 50; i++ {
 		obj, ok := service.GetTopQ().Load(strconv.Itoa(i))
@@ -359,12 +359,12 @@ func GetTopQ(c *gin.Context) {
 		}
 		util.SimpleCopyProperties(&questionVO, &question)
 		util.SimpleCopyProperties(&questionVO.Questioner, &profile)
-		topQ[i] = questionVO
+		questionsVO = append(questionsVO, questionVO)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "success",
-		"data":    topQ,
+		"data":    questionsVO,
 	})
 }
