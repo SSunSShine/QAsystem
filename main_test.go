@@ -62,10 +62,9 @@ func TestUser(t *testing.T)  {
 		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
 
 	// 修改用户
-	e.PUT("/api/user/2").
+	e.PUT("/api/user/1").
 		WithJSON(map[string]interface{}{
-			"mail": "TestUser2@163.com",
-			"password": "123456",
+			"mail": "123456@163.com",
 		}).
 		WithHeader("Authorization", token).
 		Expect().
@@ -86,7 +85,7 @@ func TestProfile(t *testing.T)  {
 		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
 
 	// 修改个人信息
-	e.PUT("/api/profile/2").
+	e.PUT("/api/profile/1").
 		WithJSON(map[string]interface{}{
 			"name": "testUser333",
 			"gender": 1,
@@ -111,11 +110,11 @@ func TestProfile(t *testing.T)  {
 		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
 
 	// 注销
-	e.DELETE("/api/profile/2").
-		WithHeader("Authorization", token).
-		Expect().
-		Status(http.StatusOK).
-		JSON().Object().ContainsKey("message").ValueEqual("message", "success")
+	//e.DELETE("/api/profile/2").
+	//	WithHeader("Authorization", token).
+	//	Expect().
+	//	Status(http.StatusOK).
+	//	JSON().Object().ContainsKey("message").ValueEqual("message", "success")
 
 }
 
