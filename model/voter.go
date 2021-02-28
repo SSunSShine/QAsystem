@@ -15,6 +15,14 @@ type Voter struct {
 	UpOrDown bool	`json:"upOrDown"`  // true 赞， false 踩
 }
 
+func (v *Voter) Get() (voter Voter, err error) {
+
+	if err = database.DB.Where(&v).First(&voter).Error; err != nil {
+		log.Print(err)
+	}
+	return
+}
+
 func (v *Voter) Create() (err error) {
 
 	if err = database.DB.Create(&v).Error; err != nil {
