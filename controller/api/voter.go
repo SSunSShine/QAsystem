@@ -139,7 +139,16 @@ func DeleteVoter(c *gin.Context)  {
 		return
 	}
 
-	if err = v.Delete(); err != nil {
+	voter, err := v.Get()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": err.Error()+": voter",
+		})
+		return
+	}
+
+	if err = voter.Delete(); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusInternalServerError,
 			"message": err.Error()+": delete voter",
