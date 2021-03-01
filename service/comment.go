@@ -34,7 +34,11 @@ func (cc *CreateCommentInterface) Create(UserID, AnswerID uint) (co model.Commen
 
 	co.UserID = UserID
 	u.ID = UserID
-	co.User, _ = u.Get()
+	co.User, err = u.Get()
+	if err != nil {
+		log.Print(err)
+		return
+	}
 
 	err = co.Create()
 	if err != nil {
