@@ -30,7 +30,11 @@ func (ca *CreateAnswerInterface) Create(UserID, QuestionID uint) (a model.Answer
 	a.Content = ca.Content
 	a.QuestionID = QuestionID
 	q.ID = QuestionID
-	a.Question, _ = q.Get()
+	a.Question, err = q.Get()
+	if err != nil {
+		log.Print(err)
+		return
+	}
 
 	a.UserID = UserID
 	u.ID = UserID
